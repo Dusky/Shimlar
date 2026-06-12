@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
             $cinput=strstr($cinput," ");
             $cinput=trim($cinput);
             if (cr_tarkista($cinput,1)) {
@@ -6,20 +8,20 @@
                 if($cinput=="null") {
               	  $chatresult="PK tag removed";
               	  $query="delete from PKTag where Id = $Id";
-              	  mysql_query($query);
+              	  mysqli_query($dbx, $query);
                 } else {
                 	if(is_substr(":pk:", $cinput)) 
                 	{
                 		$query="select * from PKTag where Id = $Id";
-                		if(($result=mysql_query($query))==TRUE &&(mysql_num_rows($result)==1)){
+                		if(($result=mysqli_query($dbx, $query))==TRUE &&(mysqli_num_rows($result)==1)){
 	                		// exists already!
   	              		$query="update PKTag set pktag = '$cinput' where Id = $Id";
-    	            		mysql_query($query);
+    	            		mysqli_query($dbx, $query);
       	          		$chatresult="PK tag updated to $cinput";
         	        	} else {
           	      		// new tag!
             	    		$query="insert into PKTag(Id,pktag) values($Id,'$cinput')";
-              	  		mysql_query($query);
+              	  		mysqli_query($dbx, $query);
                 			$chatresult="PK tag set to $cinput";
                 		}
                 	} else {

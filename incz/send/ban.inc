@@ -1,21 +1,23 @@
 <?php
+
+global $dbx;
             if(($channels==20) ||($channels==12)){
               $spammer=strstr($cinput," ");
               $spammer=ucwords(trim($spammer));
               $query="Select Id,name,channels,last_ip from Players where name='$spammer'";
-              if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-                extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+              if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+                extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                   if (!(($tgt_channels == 10)||($tgt_channels == 12)||($tgt_channels == 20))){
                     $query="update Players set banned=100 where Id = $tgt_Id";
-                    mysql_query($query);
+                    mysqli_query($dbx, $query);
                     if($tgt_last_ip !=''){
                       $query="Insert into Ipban values('$tgt_last_ip',now(),'$tgt_name')";
-                      mysql_query($query);
+                      mysqli_query($dbx, $query);
                       $query="Insert into Modactions values('$pname','$spammer','ip banned',now())";
-                      mysql_query($query);
+                      mysqli_query($dbx, $query);
                       $chatresult="$spammer has been IP banned!";
                       $query="Insert into Messages values($tgt_Id,'$pname','IP banned you',26,now())";
-                      mysql_query($query);
+                      mysqli_query($dbx, $query);
                       if (tsub($cinput,4)=="ban ") {
                       	inschat("chat1",$spammer,"has been wiped off the face of the earth!",32);
                     	inschat("chat2",$spammer,"has been wiped off the face of the earth!",32);

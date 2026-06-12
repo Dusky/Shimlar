@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 function mainproc($l,$p,$a,$k,$m,$n,$fontsize){
   global $on_limit,$REMOTEADDR,$REQUESTURI;
   $REMOTEADDR = $_SERVER['REMOTE_ADDR'];
@@ -12,8 +14,8 @@ function mainproc($l,$p,$a,$k,$m,$n,$fontsize){
       if($a=="o"){
         $loginok = false;
         $query="Select banned_ip from Ipban where banned_ip='$REMOTEADDR' limit 1";
-        $result=mysql_query($query);
-        if($result==TRUE and mysql_num_rows($result)==0){
+        $result=mysqli_query($dbx, $query);
+        if($result==TRUE and mysqli_num_rows($result)==0){
           $pid = getIdByLogin($l);
           if ($pid != -1) {
             $l = (int)$pid;
@@ -24,8 +26,8 @@ function mainproc($l,$p,$a,$k,$m,$n,$fontsize){
       
       if(($loginok) && (is_numeric($l))){
         $query="Select p.name as nimi,p.password,p.channels,p.banned,p.wrong_pw,i.checked,p.Id,p.pstatus from Players p, Inventory i where p.Id=$l and p.Id=i.Id";
-        if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-          extract(mysql_fetch_array($result));
+        if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+          extract(mysqli_fetch_array($result));
           if($p==$password && $banned !=100 && $pstatus !=0){
             srand(make_seed());
             valmista_stats($Id,$nimi,$a,$k,$m,$n);
@@ -36,7 +38,7 @@ function mainproc($l,$p,$a,$k,$m,$n,$fontsize){
               $ip=$REMOTEADDR;
               if($ip !=''){
                 $query="Insert into Ipban values('$ip',now(),'$nimi')";
-                mysql_query($query);
+                mysqli_query($dbx, $query);
                 sqlP(wrong_pw,0,$Id);
               }else {
                 myPrint("alert(\"Stop guessing passwords,your IP will be banned.\");\n");
@@ -72,48 +74,48 @@ function valmista_stats ($pid,$pname,$action,$c1,$c2,$c3){
   global $REMOTEADDR;
   $REMOTEADDR=$_SERVER['REMOTE_ADDR'];
   $query="Lock Tables Players WRITE,Modactions WRITE,Stats WRITE,Inventory WRITE,Zones WRITE,Housing WRITE,Messages WRITE,Transfers WRITE,Market WRITE,Quests WRITE,Races WRITE,Hunts WRITE,Clans WRITE,Kingdoms WRITE,chat4 WRITE, PKLog READ";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   $query="Select channels,qnum,loc_x,loc_y,loc_zone,qhd from Players where Id = $pid";
-  $result=mysql_query($query); extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
   $query="Select clan,tef,tfc,gold,banked,exp,health,e_health,lvl,align,status,turns,tstatus from Stats where Id = $pid";
-  $result=mysql_query($query); extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
 if($action=="o"||$action=="r"||$action=="he"||$action=="v"||$action=="nc"||$action=="pr"||$action=="q"){
   $query="Select race,str,dex,vit,wis,ntl,freelvl from Stats where Id = $pid";
-  $result=mysql_query($query);extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
   $race%=100;
   $rnamea=array("Human","Dwarf","Elf","Dark Elf","Giant","Troll","Goblin","Angel","Gargoyle","Balrog","Kender","Half Elf","Dark Angel","Galatai","Flame Demon","Duergar","Sprite","Genie","Dragon","Vampire");
   $rname=$rnamea[$race];
 }
 if($action=="o"||$action=="a"||$action=="nc"||$action=="pr"){
   $query="Select password,surname,fire_m,cold_m,air_m,arcane_m,sword_m,axe_m,staff_m,mace_m,armor_m,double_m from Players where Id = $pid";
-  $result=mysql_query($query);extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
 }
 if($action=="o"||$action=="h2"||$action=="h3"||$action=="u"||$action=="s"||$action=="k3"||$action=="k2"||$action=="e"||$action=="q2"||$action=="q"||$action=="gp"||$action=="my"||$action=="nc"){
   $query="Select * from Inventory where Id = $pid";
-  $result=mysql_query($query);
-  extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result));
   $invlist=array($i1,$i2,$i3,$i4,$i5,$i6,$i7,$i8,$i9,$i10,$i11,$i12,$i13,$i14,$i15,$i16,$i17,$i18,$i19,$i20,$i21,$i22,$i23,$i24,$i25,$i26,$i27,$i28,$i29,$i30);
 }
   $query="Select * from Zones where znum=$loc_zone";
-  $result=mysql_query($query); extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
   
 if($action=="b"||$action=="b2"||$action=="x"||$action=="k3"||$action=="k2"||$action=="k1") {
   $query="select checked from Inventory where Id = $pid";
-  $result=mysql_query($query);
-  extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result));
 }
 if($qnum !=0&&($action=="o"||$action=="m"||$action=="q1"||$action=="q2")){
   $query="Select * from Quests where qnum=$qnum";
-  if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-    extract(mysql_fetch_array($result));
+  if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+    extract(mysqli_fetch_array($result));
   }
 }
 if($action=="o"||$action[0]=="c"||$action[0]=="d"||$action=="pr"){
   if($clan>1){
     $query="Select * from Clans where cid=$clan";
-    $result=mysql_query($query);
-    if($result==TRUE and mysql_num_rows($result)>0){
-      extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    if($result==TRUE and mysqli_num_rows($result)>0){
+      extract(mysqli_fetch_array($result));
     }else {
       $cpower=0;
     }
@@ -127,7 +129,7 @@ if($action=="o"||$action[0]=="c"||$action[0]=="d"||$action=="pr"){
 
 $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   $query="Update Players set lastaction='$action',ax_time=now() where Id = $pid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   if($action=="o" && $c1 !=""){
     if(strlen($c1)<4){
       ep2(5);
@@ -164,9 +166,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     	}else if($c1==5){
       	if($zexit%10==$loc_y && ($zexit-($zexit%10))/10==$loc_x && $lvl>= $zlevel){
         	$query="Select znum from Zones where znum=$zone_p";
-        	$result=mysql_query($query);
-        	if(mysql_num_rows($result)==1){
-          	extract(mysql_fetch_array($result));
+        	$result=mysqli_query($dbx, $query);
+        	if(mysqli_num_rows($result)==1){
+          	extract(mysqli_fetch_array($result));
           	if($align>500 && ($znum==20 || $znum==22 || $znum==31 || $znum==34)){
             	ep2(58);
           	}else if($align<-500 && ($znum==12 || $znum==15 || $znum==21 || $znum==24|| $znum==45)){
@@ -174,8 +176,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           	}else{
 	            $loc_x=$zone_x;$loc_y=$zone_y;$loc_zone=$znum;
   	          $query="Select * from Zones where znum=$znum";
-    	        $result=mysql_query($query);
-      	      extract(mysql_fetch_array($result));
+    	        $result=mysqli_query($dbx, $query);
+      	      extract(mysqli_fetch_array($result));
         	    $lastmon=0;$lastfight=0;$e_health=0;
           	}
         	}
@@ -184,17 +186,17 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       	}
     	}else if($c1==6){
       	$query="Select znum,zlevel from Zones where zone_x=$loc_x and zone_y=$loc_y and zone_p=$loc_zone";
-	      $result=mysql_query($query);
-  	    if(mysql_num_rows($result)==1){
-    	    extract(mysql_fetch_array($result));
+	      $result=mysqli_query($dbx, $query);
+  	    if(mysqli_num_rows($result)==1){
+    	    extract(mysqli_fetch_array($result));
       	  if(($align>500 && ($znum==20 || $znum==22 || $znum==31 || $znum==34)) || ($align>-50 && $znum==47)){
         	  ep2(58);
 	        }else if(($align<-500 && ($znum==12 || $znum==15 || $znum==21 || $znum==24|| $znum==45)) || ($align<50 && $znum==46)){
   	        ep2(57);
     	    }else if($lvl>=$zlevel){
       	    $query="Select * from Zones where znum=$znum";
-        	  $result=mysql_query($query);
-          	extract(mysql_fetch_array($result));
+        	  $result=mysqli_query($dbx, $query);
+          	extract(mysqli_fetch_array($result));
 	          $loc_zone=$znum;
   	        $loc_y=$zexit%10;$loc_x=($zexit-($zexit%10))/10;
     	      $lastmon=0;$lastfight=0;$e_health=0;
@@ -204,7 +206,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   	    }
     	}
     	$query="Update Players set loc_x=$loc_x,loc_y=$loc_y,loc_zone=$loc_zone where Id = $pid";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   	} else {
   		ep2(91);
   	}
@@ -212,14 +214,14 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   
   $stuff_here=0;$zone_here=0;
   $query="Select znum from Zones where zone_x=$loc_x and zone_y=$loc_y and zone_p=$loc_zone";
-  $result=mysql_query($query);
-  if(mysql_num_rows($result)==1){
-    extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  if(mysqli_num_rows($result)==1){
+    extract(mysqli_fetch_array($result));
     $zone_here=$znum;
   }else if($zexit%10==$loc_y && ($zexit-($zexit%10))/10==$loc_x && $loc_zone !=10){
     $query="Select znum from Zones where znum=$zone_p";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result));
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result));
       $zone_here=$znum;
     }
   }
@@ -230,8 +232,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($loc_x<10 && $loc_y<10 && $loc_zone==32 && ($loc_x+$loc_y)>0){
     $stuff_here=8;
     $query="Select hint,hint2,pname as hname,pname2 as hname2,h_desc,h_status,h_flag from Housing where h_loc=($loc_x*10+$loc_y)";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result));$howned=2;
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result));$howned=2;
       if(($hint==$pid||$hint2==$pid) && ($action=="o"||$action=="m"||$action=="h2"||$action=="h3")){
         if(($h_status%4)==0){
           $hi_max=10;$query="Select h1,h2,h3,h4,h5,h6,h7,h8,h9,h10 from Housing where h_loc=($loc_x*10+$loc_y)";
@@ -240,8 +242,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         }else if(($h_status%4)==2){
           $hi_max=50;$query="Select h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12,h13,h14,h15,h16,h17,h18,h19,h20,h21,h22,h23,h24,h25,h26,h27,h28,h29,h30,h31,h32,h33,h34,h35,h36,h37,h38,h39,h40,h41,h42,h43,h44,h45,h46,h47,h48,h49,h50 from Housing where h_loc=($loc_x*10+$loc_y)";
         }
-        $result=mysql_query($query);
-        $hslist=mysql_fetch_row($result);
+        $result=mysqli_query($dbx, $query);
+        $hslist=mysqli_fetch_row($result);
       }
     }else {
       $howned=1;
@@ -249,11 +251,11 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($loc_x<18 && $loc_y<10 && $loc_zone==41 && ($loc_x+$loc_y)>0){
     $stuff_here=13;
     $query="Select * from Kingdoms where kd_loc=($loc_x*10+$loc_y)";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result));
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result));
       $query="Select cname as kdclan from Clans where cid=$kd_clan";
-      $result=mysql_query($query);
-      extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      extract(mysqli_fetch_array($result));
       if($kd_clan!=$clan){
         $kd_gold="???";
       }
@@ -293,14 +295,14 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   if ($stuff_here!=0) {
   	$e_health=0;
   	$query="update Stats set e_health = 0 where Id = $pid";
-  	mysql_query($query);
+  	mysqli_query($dbx, $query);
   }
   
   if($action=="t"){
     if((($c1>=0 && $c1<23 && $c1 !=10)||$c1==26||$c1==32||$c1==40||$c1==41) && $stuff_here==1){
       $query="Select * from Zones where znum=$c1";
-      $result=mysql_query($query);
-      extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      extract(mysqli_fetch_array($result));
       $accs=accn($pid);
       if($accs==41180000 ){
         $cost=0;
@@ -310,36 +312,36 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if($zlevel<=$lvl && $gold>=$cost){
         if($align>500 && ($c1==20 || $c1==22 || $c1==31 || $c1==34)){
           $query="Select * from Zones where znum=$loc_zone";
-          $result=mysql_query($query);
-          extract(mysql_fetch_array($result));
+          $result=mysqli_query($dbx, $query);
+          extract(mysqli_fetch_array($result));
           ep2(58);
         }else if($align<-500 && ($c1==12 || $c1==15 || $c1==21 || $c1==24|| $c1==45)){
           $query="Select * from Zones where znum=$loc_zone";
-          $result=mysql_query($query);
-          extract(mysql_fetch_array($result));
+          $result=mysqli_query($dbx, $query);
+          extract(mysqli_fetch_array($result));
           ep2(57);
         }else{
           $loc_x=($zexit-($zexit%10))/10;$loc_y=($zexit%10);$loc_zone=$c1;$gold=$gold-$cost;$stuff_here=0;$e_health=0;$lastmon=0;$lastfight=0;
           $query="Update Players set loc_x=$loc_x,loc_y=$loc_y,loc_zone=$loc_zone where Id = $pid";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="Update Stats set gold=$gold,e_health=0 where Id = $pid";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="Select znum from Zones where znum=$zone_p";
-          if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-            extract(mysql_fetch_array($result));
+          if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+            extract(mysqli_fetch_array($result));
             $zone_here=$znum;
           }
           myPrint("mX(0);");
          }
        }else if($zlevel>$lvl){
         $query="Select * from Zones where znum=$loc_zone";
-        $result=mysql_query($query);
-        extract(mysql_fetch_array($result));
+        $result=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($result));
         ep2(8);
       }else if($gold<$cost){
         $query="Select * from Zones where znum=$loc_zone";
-        $result=mysql_query($query);
-        extract(mysql_fetch_array($result));
+        $result=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($result));
         ep2(16);
       }
     }else if($stuff_here !=1){
@@ -350,14 +352,14 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($action=="h1"){
     if($stuff_here==8){
     	$query="select * from Housing where hint = $pid";
-    	$result = mysql_query($query);
-    	if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==0)
+    	$result = mysqli_query($dbx, $query);
+    	if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==0)
     	{
       	if($howned==1 && $gold>=20000000){
         	$gold-=20000000;
         	sqlS(gold,$gold,$pid);
         	$query="Insert into Housing values($pid,null,'$pname','',$loc_x*10+$loc_y,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','')";
-        	mysql_query($query);
+        	mysqli_query($dbx, $query);
         	$hslist=array(0,0,0,0,0,0,0,0,0,0);$hi_max=10;
         	$h_status=0;$howned=2;$h_desc="";$h_flag="";$hname=$pname;
         	myPrint("mX(21);");
@@ -437,23 +439,23 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
        	 	$hname2=$c1;
         	if (cr_tarkista($hname2,1,true)) {
           	$query="update Housing set pname2='', hint2=null where h_loc=($loc_x*10+$loc_y)";
-  	  			mysql_query($query);
+  	  			mysqli_query($dbx, $query);
         	} else {
           	ep2(65);
         	}
       	} else {
         	$query="Select name,Id,tstatus,lvl from Stats where name='$c1'";
-        	if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-          	extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+        	if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+          	extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           	$query="select * from Housing where hint2 = $tgt_Id";
-          	if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==0){
+          	if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==0){
           		if($tgt_tstatus == $tstatus) {
           			if($tgt_Id!=$pid){
           				if ($tstatus==1 && $tgt_lvl < 300) {
           					ep2(86);
           				} else {
             				$query="update Housing set pname2='$tgt_name', hint2=$tgt_Id where h_loc=($loc_x*10+$loc_y)";
-  	    						mysql_query($query);
+  	    						mysqli_query($dbx, $query);
   	    						if ($tstatus==1) {
         							$gold-=20000000;
         							sqlS(gold,$gold,$pid);
@@ -547,7 +549,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       $banked=$banked+$c1;
       $gold=$gold-$c1;
       $query="Update Stats set gold=$gold,banked=$banked,e_health=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(1);");
     }else if($c1>$gold){
       ep2(11);
@@ -561,7 +563,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       // checkCookie($pid); really needed?
       $gold=0;
       $query="Update Stats set gold=0,banked=$banked,e_health=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(1);");
     }else if($health==0){
       ep2(12);
@@ -572,7 +574,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       $banked=$banked-$c1;
       $gold=$gold+$c1;
       $query="Update Stats set gold=$gold,banked=$banked,e_health=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(2);");
     }else if($c1>$banked){
       ep2(13);
@@ -584,7 +586,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       $gold=$gold+$banked;
       $banked=0;
       $query="Update Stats set gold=$gold,banked=$banked,e_health=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(2);");
     }else if($health==0){
       ep2(12);
@@ -597,8 +599,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     			if($c1>0 && $c1<=$banked && $health>0 && $stuff_here==4){
       			$c2=trim(ucwords($c2));
       			$query="Select banked,Id,tstatus from Stats where name='$c2'";
-      			if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      				extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+      			if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      				extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
         			if($tgt_Id==$pid){
           			ep2(14);
           		} else if (($tgt_tstatus==1)&&($pname!="J.NicoletteCanne")) {
@@ -609,9 +611,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           			sqlS(banked,$banked,$pid);
           			sqlS(banked,$tgt_banked,$tgt_Id);
           			$query="Insert into Messages values($tgt_Id,'$pname',$c1,21,now())";
-          			mysql_query($query);
+          			mysqli_query($dbx, $query);
           			$query="update Stats set e_health=0 where e_health = -1 and Id = $pid";
-      					mysql_query($query);
+      					mysqli_query($dbx, $query);
           			debugText("Transfer from ".$pname." to ".$c2." amount ".$c1);
           			myPrint("mX(3);");
         			}
@@ -636,7 +638,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==3){
       $c1=trim(ucwords($c1));
       $query="Select name,loc_x,loc_y,loc_zone,Id from Players where name='$c1' and channels!=20 and channels!=12";
-      if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
+      if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
         $accs=accn($pid);
         if($accs==41180000 ){
           $cost=0;
@@ -644,7 +646,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           $cost=20000;
         }
         if($gold>=$cost){
-          extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+          extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           $gold=$gold-$cost;$spec_find=1;
           $tgt_accs=accn($tgt_Id);
           if($tgt_accs==41170000){
@@ -665,7 +667,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($health==0 && $stuff_here==1){
       $health=$vit;
       $query="update Stats set health=$health, e_health=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(4);");
     }
   }else if($action=="a"){
@@ -699,8 +701,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     }
     if($exp>=$nxlvl){
       $query="Select r_str,r_dex,r_vit,r_ntl,r_wis from Races where rid=$race";
-      $result=mysql_query($query);
-      extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      extract(mysqli_fetch_array($result));
       $str=$str+$r_str*0.5;$dex=$dex+$r_dex*0.5;
       $ntl=$ntl+$r_ntl*0.5;$wis=$wis+$r_wis*0.5;
       $vit=$vit+$r_vit*0.5;
@@ -724,8 +726,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if($lvl%10==0 && $clan>1){
         $cpowerx=clanp($lvl)-clanp($lvl-1);
         $query="Select cpower from Clans where cid=$clan";
-        $result=mysql_query($query);
-        extract(mysql_fetch_array($result));
+        $result=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($result));
         sqlC(cpower,$cpower+$cpowerx,$clan);
       }
     }
@@ -733,15 +735,15 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       --$freelvl;
     }
     $query="Update Stats set str=$str,dex=$dex,vit=$vit,ntl=$ntl,wis=$wis,health=$health,exp=$exp,lvl=$lvl,freelvl=$freelvl where Id = $pid";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   }else if($action=="u"){
     $price=round(50*pow(1.7,(int)$c2));
     if (($c2-floor($c2)>0)||($c1-floor($c1)>0)||(!(($c1>0&&$c1<11)||$c1==41))||(!($c2>=0&&$c2<37))){
         debugText("SHOPBAN ".$pname." c1=$c1 c2=$c2 ");
         $query="Insert into Modactions values('SHOPBAN','$pname','autoban IC $c2',now())";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $query="Update Players set banned=100 where name='$pname'";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         ep2(1);
     }
     switch ($c2){
@@ -833,9 +835,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($action=="s"){
     if($c1>=0 && $c1<30){
       $query="Select kd_misc from Kingdoms where kd_clan=$clan";
-      $result=mysql_query($query);
-      if($result==TRUE and mysql_num_rows($result)>0){
-        extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      if($result==TRUE and mysqli_num_rows($result)>0){
+        extract(mysqli_fetch_array($result));
       }else{
         $kd_misc=0;
       }
@@ -902,16 +904,16 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($action=="k3") {
     if(($c2==0 && $c3==0) && ((int)$channels!=66) && ($checked==0) && ($tstatus==0)) {
       $query="select * from Market where tid = $c1";
-      $result=mysql_query($query);
+      $result=mysqli_query($dbx, $query);
       $x=0; $itsforme=true;
-      if(($result==TRUE) && (mysql_num_rows($result)==1)){
-        extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+      if(($result==TRUE) && (mysqli_num_rows($result)==1)){
+        extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
         if ($pid!=$tgt_tto) {
           $itsforme = false;
           $query="update Players set banned = 100 where Id = $pid";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="insert into Modactions values('Lord A','$pname','sales jip!', now())";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
         }
       	for($i=0;$i<30;++$i){
           if($x==0 && $invlist[$i]==0){
@@ -928,19 +930,19 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           $invlist[$x-1]=$tgt_titem;   // give item                                                                        
           $sqlix="i$x";sqlI($sqlix,$tgt_titem,$pid);                                                           
           $query="Select pname, tradex from Inventory where Id = $tgt_tfrom";                                         
-          $result=mysql_query($query);                                                                     
-          extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");                                       
+          $result=mysqli_query($dbx, $query);                                                                     
+          extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");                                       
           $y=$tgt_tradex;                                                                                  
           $query="Update Inventory set i$y=0,tradex=0 where Id = $tgt_tfrom";      // take item                           
-          mysql_query($query);                                                                             
+          mysqli_query($dbx, $query);                                                                             
           $query="Update Stats set banked=banked+$tgt_tprice where Id = $tgt_tfrom";   // give gold                           
-          mysql_query($query);                                                                                                                                                   
+          mysqli_query($dbx, $query);                                                                                                                                                   
           $query="delete from Market where tid=$c1";                                                      
-          mysql_query($query);$tspecial=1;                                                                 
+          mysqli_query($dbx, $query);$tspecial=1;                                                                 
           $query="Insert into Messages values($tgt_tfrom,'$pname','accepted your trade',26,now())";           
-          mysql_query($query);                                                                             
+          mysqli_query($dbx, $query);                                                                             
           $query="Insert into Transfers values('$tgt_pname','$pname',$tgt_titem,now(),3)";                     
-          mysql_query($query);                                                                             
+          mysqli_query($dbx, $query);                                                                             
           writeLogFile("Item-Sale from:$tgt_pname to:$pname item:$tgt_titem price:$tgt_tprice", "transferlog.txt");
           $statmode=1;                                                                                     
           myPrint("mX(14);");                                                                              
@@ -970,8 +972,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           $c2=trim(ucwords($c2));
           if($c3==0){
             $query="Select Inventory.*,Players.banned,Stats.tstatus from Inventory, Players, Stats where Inventory.pname='$c2' and Inventory.Id = Players.Id and Players.Id = Stats.Id";
-            if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-              extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+            if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+              extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
               $tgt_invlist=array($tgt_i1,$tgt_i2,$tgt_i3,$tgt_i4,$tgt_i5,$tgt_i6,$tgt_i7,$tgt_i8,$tgt_i9,$tgt_i10,$tgt_i11,$tgt_i12,$tgt_i13,$tgt_i14,$tgt_i15,$tgt_i16,$tgt_i17,$tgt_i18,$tgt_i19,$tgt_i20,$tgt_i21,$tgt_i22,$tgt_i23,$tgt_i24,$tgt_i25,$tgt_i26,$tgt_i27,$tgt_i28,$tgt_i29,$tgt_i30);
               for($i=0;$i<30;++$i){
                 if($y==0 && $tgt_invlist[$i]==0){
@@ -992,13 +994,13 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
                   $sqlix="i$x";sqlI($sqlix,0,$pid);
                   $sqliy="i$y";sqlI($sqliy,$iy,$tgt_Id);
                   $query="Insert into Messages values($tgt_Id,'$pname',$iy,22,now())";
-                  mysql_query($query);
+                  mysqli_query($dbx, $query);
                   $query="Insert into Transfers values('$pname','$c2',$iy,now(),2)";
-                  mysql_query($query);
+                  mysqli_query($dbx, $query);
                   writeLogFile("Item-Give from:$pname to:$c2 item:$iy", "transferlog.txt");
                   if($tradex==$x){
                     $query="delete from Market where tfrom=$pid";
-                    mysql_query($query);
+                    mysqli_query($dbx, $query);
                     sqlI(tradex,0,$pid);$tspecial=1;
                   }
                 	myPrint("mX(10);");
@@ -1009,8 +1011,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             }
           }else{
             $query="Select Inventory.pname,Inventory.Id,Players.banned,Stats.tstatus from Inventory, Players, Stats where Inventory.pname='$c2' and Players.Id = Inventory.Id and Stats.Id = Players.Id";
-            if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-              extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+            if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+              extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
               if($tgt_Id==$pid){
                 ep2(14);
               }else if((int)$tgt_banned==100){
@@ -1021,12 +1023,12 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
                 $iy=$invlist[$c1];
                 if($rhand !=$x && $lhand !=$x && $spellone !=$x && $spelltwo !=$x && $armor !=$x && $accx !=$x && $iy>0){
                   $query="delete from Market where tfrom=$pid";
-                  mysql_query($query);
+                  mysqli_query($dbx, $query);
                   sqlI(tradex,$x,$pid);$tradex=$x;$tspecial=1;
                   $query="Insert into Market values(null,$tgt_Id,$pid,$iy,$c3)";
-                  mysql_query($query);
+                  mysqli_query($dbx, $query);
                   $query="Insert into Messages values($tgt_Id,'$pname','offers you a trade',26,now())";
-                  mysql_query($query);
+                  mysqli_query($dbx, $query);
                   myPrint("mX(16);");
                 }
               }
@@ -1058,7 +1060,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
               $invlist[$c2]=0;
               $i_num=$invlist[$c1];
               $query="Update Inventory set i$x=$i_num,i$y=0 where Id = $pid";
-              mysql_query($query);
+              mysqli_query($dbx, $query);
               myPrint("mX(11);");
             }
           }else if($i_type>10 || $i_num>14){
@@ -1068,7 +1070,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
               $invlist[$c2]=0;
               $i_num=$invlist[$c1];
               $query="Update Inventory set i$x=$i_num,i$y=0 where Id = $pid";
-              mysql_query($query);
+              mysqli_query($dbx, $query);
               myPrint("mX(11);");
             }else if(($invlist[$c1]%10000)<100){
               $x=$c1+1;$y=$c2+1;
@@ -1076,7 +1078,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
               $invlist[$c2]=0;
               $i_num=$invlist[$c1];
               $query="Update Inventory set i$x=$i_num,i$y=0 where Id = $pid";
-              mysql_query($query);
+              mysqli_query($dbx, $query);
               myPrint("mX(11);");
             }
           }
@@ -1086,9 +1088,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($action=="q1"){
     if($qnum==0||$qstatus==0){
       $query="Select * from Quests where qnum=$c1";
-      $result=mysql_query($query);
-      if($result==TRUE && mysql_num_rows($result)==1){
-        extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      if($result==TRUE && mysqli_num_rows($result)==1){
+        extract(mysqli_fetch_array($result));
         if($qstatus==0 && $qlevel>=$lvl && $qhd==0 && $qminlvl<=$lvl){
           $qnum=$c1;
           sqlP(qnum,$qnum,$pid);
@@ -1123,11 +1125,11 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $sqlix="i$x";sqlI($sqlix,$qitem,$pid);
       }
       $query="Update Stats set gold=$gold,exp=$exp where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       $query="Update Players set quests=quests+1,qnum=0 where Id = $pid";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       $query="Delete from Quests where qnum=$qnum";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       myPrint("mX(20);");
       $qnum=0;
     }else if($qstatus!=0){
@@ -1249,13 +1251,13 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if($lvl>=$lmin){
         $cpowerx=clanp($lvl);
         $query="Select cpower from Clans where cid=$clan";
-        $result=mysql_query($query);
-        extract(mysql_fetch_array($result));
+        $result=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($result));
         sqlC(cpower,$cpower-$cpowerx,$clan);
         $freelvl=$freelvl+$lvl-5;$exp=0;$gold-=100000;$lvl=1;
         $query="Select race from Stats where Id = $pid";
-        $result=mysql_query($query);
-        extract(mysql_fetch_array($result));
+        $result=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($result));
         // check on gender before giving new race
         if($race>=100){
           $newrace=$c1+100;
@@ -1264,8 +1266,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         }
         $race=$newrace;$rname=$rnamea[$c1];
         $query="Select * from Races where rid=$c1";
-        $stats=mysql_query($query);
-        extract(mysql_fetch_array($stats));
+        $stats=mysqli_query($dbx, $query);
+        extract(mysqli_fetch_array($stats));
         $armor_m=max($armor_bonus,min($armor_m-20,$armor_max));
         $sword_m=max($sword_bonus,min($sword_m-20,$sword_max));
         $axe_m=max($axe_bonus,min($axe_m-20,$axe_max));
@@ -1278,11 +1280,11 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $str=$r_str;$dex=$r_dex;$ntl=$r_ntl;$wis=$r_wis;$vit=$r_vit;$health=$vit;
         $lhand=0;$rhand=0;$armor=0;$spellone=0;$spelltwo=0;$accx=0;$tradex=0;
         $query="Update Stats set str=$str,dex=$dex,ntl=$ntl,wis=$wis,vit=$vit,health=$health,race=$race,lvl=1,freelvl=$freelvl,exp=0,gold=$gold where Id = $pid";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $query="Update Players set sword_m=$sword_m,axe_m=$axe_m,staff_m=$staff_m,mace_m=$mace_m,fire_m=$fire_m,cold_m=$cold_m,air_m=$air_m,arcane_m=$arcane_m,armor_m=$armor_m where Id = $pid";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $query="Update Inventory set lhand=0,rhand=0,spellone=0,spelltwo=0,armor=0,accx=0,tradex=0 where Id = $pid";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $lhand=0;$rhand=0;$spellone=0;$spelltwo=0;$armor=0;$accx=0;
         myPrint("mX(25);");
       }else {
@@ -1442,7 +1444,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       }else if($prayeff==10){
       	if (($tstatus==1) && ($turns<5354)) {
       		$query="update Stats set turns=turns+45 where Id = $pid";
-      		mysql_query($query);
+      		mysqli_query($dbx, $query);
       		myPrint("mX(44);");
       	} else {
       		myPrint("mX(27);");
@@ -1503,7 +1505,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           }
         }
         $query="Update Stats set tef=$tef,tfc=$tfc,gold=$gold where Id = $pid";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         myPrint("mX(31);");
       }else if($gold<$price){
         ep2(16);
@@ -1516,16 +1518,16 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if($cpower==0 && strlen($c1)>3 && strlen($c1)<31){
         if($gold>=10000000 && $lvl>299){
           $query="Select cname from Clans where cname='$c1'";
-          $result=mysql_query($query);
-          if($result==TRUE and mysql_num_rows($result)==0){
+          $result=mysqli_query($dbx, $query);
+          if($result==TRUE and mysqli_num_rows($result)==0){
             $cname=$c1;$gold-=10000000;$cpower=clanp($lvl);
             $query="Insert into Clans (cname,cint,cint2,cleader,cleader2,cpower,cbonus,cduels,cturn) values('$cname',$pid,null,'$pname','',$cpower,0,0,$tstatus)";
-            mysql_query($query);$cleader=$pname;$cleader2="";
+            mysqli_query($dbx, $query);$cleader=$pname;$cleader2="";
             $query="Select cid from Clans where cname='$cname'";
-            $result=mysql_query($query);
-            extract(mysql_fetch_array($result));
+            $result=mysqli_query($dbx, $query);
+            extract(mysqli_fetch_array($result));
             $query="Update Stats set clan=$cid,gold=$gold where Id = $pid";
-            mysql_query($query);
+            mysqli_query($dbx, $query);
             myPrint("mX(32);");
           }else{
             ep2(51);
@@ -1548,15 +1550,15 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==12){
       if($cpower>0 && $cint==$pid){
         $query="Select Id,name,clan,lvl,tstatus from Stats where name='$c1'";
-        if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-          extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+        if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+          extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           if ($tgt_lvl > 299) {
           	if($tgt_Id!=$pid && $tgt_clan==$clan){
             	$cleader2=$tgt_name;
             	$query="update Clans set cint2 = $tgt_Id, cleader2 = '$tgt_name' where cid = $clan and cturn=$tgt_tstatus";
-            	if (mysql_query($query)) {
+            	if (mysqli_query($dbx, $query)) {
             		$query="Insert into Messages values($tgt_Id,'$pname','has made you the second leader of clan $name',26,now())";
-            		mysql_query($query);
+            		mysqli_query($dbx, $query);
             		myPrint("mX(35);");
             	} else {
             		ep2(78);
@@ -1578,8 +1580,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if (cr_tarkista($c1,1,false)) {
       if($cpower>0 && ($cint==$pid || $cint2==$pid) && $gold>=1000000){
         $query="Select Id,name,lvl,clan,tstatus from Stats where name='$c1'";
-        if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-          extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+        if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+          extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           if($tgt_clan==1 && $tgt_lvl>99){
           	if ($tgt_tstatus==$tstatus) {
             	$gold-=1000000;
@@ -1588,7 +1590,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             	sqlS(clan,$clan,$tgt_Id);
             	sqlC(cpower,$cpower,$clan);
             	$query="Insert into Messages values($tgt_Id,'$pname','accepted you into clan $cname',26,now())";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	myPrint("mX(33);");
             } else {
             	ep2(78);
@@ -1618,22 +1620,22 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==12){
       if($cpower>0 && ($cint==$pid || $cint2==$pid)){
         $query="Select Id,name,lvl,clan from Stats where name='$c1'";
-        if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-          extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+        if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+          extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           if($tgt_clan==$clan && $tgt_Id !=$pid && $tgt_Id !=$cint && $tgt_Id != $cint2){
             $cpower-=clanp($tgt_lvl);
             sqlS(clan,0,$tgt_Id);
             sqlC(cpower,$cpower,$clan);
             if($tgt_Id==$cint2){
               $query="update Clans set cint2 = null, cleader2 = '' where cid = $clan";
-              mysql_query($query);
+              mysqli_query($dbx, $query);
             }
             if((15*$cbonus)>$cpower){
               $cbonus=0;
               sqlC(cbonus,$cbonus,$clan);
             }
             $query="Insert into Messages values($tgt_Id,'$pname','removed you from clan $cname',26,now())";
-            mysql_query($query);
+            mysqli_query($dbx, $query);
             myPrint("mX(34);");
           }else if($tgt_clan !=$clan){
             ep2(48);
@@ -1673,23 +1675,23 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         	if ($tstatus==0) {
           	if($cleader2 !=""){
             	$query="update Clans set cint=$cint2, cleader = '$cleader2', cint2 = null, cleader2 = '' where cid = $clan";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	$cpower-=clanp($lvl);$cleader=$cleader2;$cleader2="";
             	sqlS(clan,0,$pid);
             	sqlC(cpower,$cpower,$clan);
             	$query="Insert into Messages values($cint2,'$pname','has left the clan $cname, making you the leader',26,now())";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	myPrint("mX(38);");
           	}else{
             	$cleader="";$cpower=-1;
             	$query="Update Stats set banked=banked+500000 where clan=$clan";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	$query="Delete from Clans where cid=$clan";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	$query="Delete from Kingdoms where kd_clan=$clan";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	$query="Update Stats set clan=0 where clan='$clan'";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	myPrint("mX(42);");
           	}
           	$clan=0;
@@ -1700,7 +1702,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($pid==$cint2){
           	if ($tstatus==0) {
             	$query="update Clans set cint2 = null, cleader2 = '' where cid = $clan";
-            	mysql_query($query);
+            	mysqli_query($dbx, $query);
             	$cpower-=clanp($lvl);$cleader2="";
             	sqlS(clan,"",$pid);
             	sqlC(cpower,$cpower,$clan);
@@ -1718,9 +1720,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           }
           if ($clan==0) {
          	 	$query="Insert into Messages values($cint,'$pname','has left the clan $cname',26,now())";
-          	mysql_query($query);
+          	mysqli_query($dbx, $query);
           	$query="Insert into Messages values($cint2,'$pname','has left the clan $cname',26,now())";
-          	mysql_query($query);
+          	mysqli_query($dbx, $query);
         	}
         }
         if ($clan==0) {
@@ -1750,12 +1752,12 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==13){
       if($kd_clan==0 && $gold>=1000000 && $cpower>0 && ($pid==$cint || $pid==$cint2)){
         $query="Select kd_def from Kingdoms where kd_clan=$clan";
-        $result=mysql_query($query);
-        if($result==TRUE and mysql_num_rows($result)==0){
+        $result=mysqli_query($dbx, $query);
+        if($result==TRUE and mysqli_num_rows($result)==0){
           $gold-=1000000;
           sqlS(gold,$gold,$pid);
           $query="Insert into Kingdoms values($loc_x*10+$loc_y,$clan,'','',0,0,0,0,1,0,10000000)";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $kdclan=$cname;$kd_def=0;$kd_mine=0;$kd_tax=0;$kd_gold=0;$kd_desc="";$kd_flag="";
           myPrint("mX(39);");
         }else{
@@ -1859,21 +1861,21 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }
   $REMOTEADDR=$_SERVER['REMOTE_ADDR'];
   $query="Update Players set wrong_pw=0,last_ip='$REMOTEADDR' where Id = $pid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   $query="Update Stats set status=$lastmon where Id = $pid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   if(($action=="e"||$action=="s"||$action=="q"||$action=="h2"||$action=="gp"||$action=="my") && $c1==($tradex-1)){
     $query="delete from Market where tfrom=$pid";
-    mysql_query($query);$tspecial=1;$tradex=0;
+    mysqli_query($dbx, $query);$tspecial=1;$tradex=0;
     sqlI(tradex,0,$pid);
   }
   if($action=="e" && $c2==($tradex-1)){
     $query="delete from Market where tfrom=$pid";
-    mysql_query($query);$tspecial=1;$tradex=0;
+    mysqli_query($dbx, $query);$tspecial=1;$tradex=0;
     sqlI(tradex,0,$pid);
   }
   $query="Unlock Tables";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   if($action=="o"||$action=="nc"){
     myPrint("x0(\"$pname\",\"$password\",\"$rname\",\"$surname\",\"$pid\",$turns,$tstatus);");
     sqlS(fmt,1,$pid);
@@ -1885,8 +1887,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     $lastmon=$status;
     if($action=="o"){
       $query="Select status,opponent from Stats where Id = $pid";
-      $result=mysql_query($query);
-      extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      extract(mysqli_fetch_array($result));
     }
     if($lastmon<1000){
       $opponent=0;
@@ -1897,8 +1899,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   if($action=="o"||$action=="u"||$action=="s"||$action=="e"||$action=="k3"||$action=="q2"||$action=="h2"||$action=="h3"||$action=="gp"||$action=="k2"||$action=="k3"||$action=="my"){
     $imsg="";
     $query="Select * from Inventory where Id = $pid";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     $invlist=array($i1,$i2,$i3,$i4,$i5,$i6,$i7,$i8,$i9,$i10,$i11,$i12,$i13,$i14,$i15,$i16,$i17,$i18,$i19,$i20,$i21,$i22,$i23,$i24,$i25,$i26,$i27,$i28,$i29,$i30);
     for($i=0;$i<30;++$i){
       $ix=$invlist[$i];
@@ -1912,8 +1914,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }
   if($action=="o"||$action=="q"||$tspecial==1||$action=="k2"||$action=="k3"||$action=="nc"){
     $query="select lhand,rhand,spellone,spelltwo,armor,accx,tradex from Inventory where Id = $pid";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     myPrint("x5($lhand,$rhand,$spellone,$spelltwo,$armor,$accx,$tradex);");
   }
   if($action=="o"||$action=="m"||$action=="t"||$action=="rf"){
@@ -1927,7 +1929,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     }
     if($zhunt>0 && $stuff_here==0){
       $query="Select bname from Hunts where bzone=$loc_zone";
-      $result=mysql_query($query); extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
       myPrint("xB(\"$bname\");");
     }
   }
@@ -1972,10 +1974,10 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   if($action=="k1"||$action=="k2"||$action=="k3"){
     $stuff_here=6;$statmode=1;
     $query="select m.tid, m.titem, m.tprice, p.name from Market m, Players p where m.tto = $pid and p.Id = m.tfrom";
-    $result=mysql_query($query);
-    $c1=mysql_num_rows($result);
+    $result=mysqli_query($dbx, $query);
+    $c1=mysqli_num_rows($result);
     for($i=0;$i<$c1;++$i){
-      $row=mysql_fetch_row($result);
+      $row=mysqli_fetch_row($result);
       $tradeids.="$row[0],";
       $tradeitem.="$row[1],";
       $tradeprice.="$row[2],";
@@ -1991,8 +1993,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
 }
 function valmista_duel($pid,$tstatus){
  	$query="Select p.loc_x,p.loc_y,p.loc_zone,p.channels,p.last_ip,s.lvl,s.clan from Players p, Stats s where p.Id = $pid and s.Id = p.Id";
- 	$result=mysql_query($query);
-  extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+ 	$result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
   if (($tgt_channels==20)||($tgt_channels==12)||($tgt_loc_zone==40)) {
     $tgt_ilvl=4;
     $tgt_alvl=100000;
@@ -2007,10 +2009,10 @@ function valmista_duel($pid,$tstatus){
   //	$query="Select s.name, s.align, s.Id, s.clan from Players p,Stats s where p.Id=s.Id and p.Id != $pid and p.last_ip not like '$tgt_last_ip' and p.loc_x=$tgt_loc_x and p.loc_y=$tgt_loc_y and p.loc_zone=$tgt_loc_zone and s.health>0 and p.channels <> 20 and s.lvl>=$tgt_ilvl and s.lvl<=$tgt_alvl and s.tstatus = 0 order by s.name";
   	$query="Select s.name, s.align, s.Id, s.clan from Players p,Stats s where p.Id=s.Id and p.Id != $pid and p.last_ip not like '$tgt_last_ip' and p.loc_x=$tgt_loc_x and p.loc_y=$tgt_loc_y and p.loc_zone=$tgt_loc_zone and s.health>0 and p.channels <> 20 and s.lvl>=$tgt_ilvl and s.lvl<=$tgt_alvl and s.tstatus = $tstatus order by s.name";
   }
-  $result=mysql_query($query);
-  $c1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $c1=mysqli_num_rows($result);
   for($i=0;$i<$c1;++$i){
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $duelclan = $row[3];
     if (($duelclan != 60) && ($duelclan == $tgt_clan)) {
     	$duelnames.="$row[0] (C),";
@@ -2029,12 +2031,12 @@ function valmista_quest($signedQuest){
   global $REMOTEADDR;
   $REMOTEADDR=$_SERVER['REMOTE_ADDR'];
   $query="Select * from Quests order by qnum";
-  $result=mysql_query($query);
-  $c1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $c1=mysqli_num_rows($result);
   if($c1>0){
     for($i=0;$i<$c1;++$i){
       $qname="";
-      $row=mysql_fetch_row($result);
+      $row=mysqli_fetch_row($result);
       if($row[7]==$signedQuest && $row[6]==0){
         $qname="y";
       } else if ($row[6] > 0) {

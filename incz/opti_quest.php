@@ -12,7 +12,7 @@ init_dbx();
 
 $query="Optimize table Market,Quests,Ipban,chat3"; 
 
-mysql_query($query);
+mysqli_query($dbx, $query);
 
 
 

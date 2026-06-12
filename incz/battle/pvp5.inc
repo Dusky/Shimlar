@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
     if($e_health<=0){
       if($loc_zone!=40){
       	$pked=false;
@@ -38,7 +40,7 @@
   				// update the pk'ed person
   				if ($tgt_tstatus==1) {
   					$query="update Stats set fame=fame+$pkedFame where Id = $tgt_Id";
-  					mysql_query($query);
+  					mysqli_query($dbx, $query);
   				} 
   			}
         $gold+= round(($tgt_gold*$tgt_death_gold)*$Trandperc);
@@ -60,7 +62,7 @@
         }
         if($pked) {
           $query="update Stats set PKill=(PKill+1),align=$align,fame=fame+$fame where Id = $Id";
-          mysql_query($query);          
+          mysqli_query($dbx, $query);          
         } else {
           sqlS(align,$align,$Id);
         }

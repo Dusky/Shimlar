@@ -1,12 +1,14 @@
 <?php
 
+global $dbx;
+
 function valmista_duel($pid,$tstatus){
 
   $query="Select Players.loc_x as loc_x, Players.loc_y as loc_y, Players.loc_zone as loc_zone, Players.channels as channels, Players.last_ip as last_ip, Stats.lvl as lvl, Stats.clan as clan from Players , Stats  where Players.Id = $pid and Stats.Id = Players.Id";
 
-  $result=mysql_query($query);
+  $result=mysqli_query($dbx, $query);
 
-  $testArray = mysql_fetch_array($result);
+  $testArray = mysqli_fetch_array($result);
 
   extract($testArray,EXTR_PREFIX_ALL,"tgt");
 
@@ -38,13 +40,13 @@ function valmista_duel($pid,$tstatus){
 
   }
 
-  $result=mysql_query($query);
+  $result=mysqli_query($dbx, $query);
 
-  $c1=mysql_num_rows($result);
+  $c1=mysqli_num_rows($result);
 
   for($i=0;$i<$c1;++$i){
 
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
 
     $duelclan = $row[3];
 

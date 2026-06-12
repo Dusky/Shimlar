@@ -2,23 +2,22 @@
 
 /*$filename = "/home/shimlar/critical.inc";
 include($filename);*/
-$shim_user="shimlar";
-$shim_pass="WTF574Y!0Ut";
+
+$shim_host = getenv('DB_HOST') ?: 'localhost';
+$shim_user = getenv('DB_USER') ?: 'shimlar';
+$shim_pass = getenv('DB_PASS') ?: 'shimlar';
+$shim_db   = getenv('DB_NAME') ?: 'shimlar_game';
 
 function init_dbx(){
-  global $dbx,$shim_user,$shim_pass;
-  $dbx=mysql_connect('localhost',$shim_user,$shim_pass);
+  global $dbx,$shim_host,$shim_user,$shim_pass,$shim_db;
+  $dbx=mysqli_connect($shim_host,$shim_user,$shim_pass,$shim_db);
   if (!$dbx) {
-  	die(print 'Could not connect: ' . mysql_error());
+  	die('Could not connect: ' . mysqli_connect_error());
   }
-  $db_selected = mysql_select_db ("shimlar_game",$dbx);
-	if (!$db_selected) {
-   	die(print 'Can not use db : ' . mysql_error());
-	}
 }
 function close_dbx(){
-  global $dbx,$shim_user,$shim_pass;
-  mysql_close($dbx);
+  global $dbx;
+  mysqli_close($dbx);
 }
 function ep2($errnum){
   print "eX($errnum);\n";
@@ -45,7 +44,7 @@ function secondGem($xcode) {
 }
 function inumdropRandom($xcode) {
 	$xcode=($xcode-($xcode%5))/5;
-	if ($xcode==0) {
+	if($xcode==0) {
 		return 0;
 	} else {
 		return (rand(0,$xcode+1)*5);
@@ -77,32 +76,39 @@ function tarkista($jono){
 return 1;
 }
 function inschat($xchat,$xname,$xtxt,$xtype){
+  global $dbx;
   $query="insert into $xchat (msgname,msgtxt,msgtype) values(\"$xname\",\"$xtxt\",\"$xtype\")";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlP($sqlvar,$sqlvalue,$sqlid){
+  global $dbx;
   $query="update Players set $sqlvar='$sqlvalue' where Id = $sqlid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlS($sqlvar,$sqlvalue,$sqlid){
+  global $dbx;
   $query="update Stats set $sqlvar='$sqlvalue' where Id = $sqlid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlI($sqlvar,$sqlvalue,$sqlid){
+  global $dbx;
   $query="update Inventory set $sqlvar='$sqlvalue' where Id = $sqlid";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlH($sqlvar,$sqlvalue,$sqlloc){
+  global $dbx;
   $query="update Housing set $sqlvar='$sqlvalue' where h_loc=$sqlloc";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlC($sqlvar,$sqlvalue,$sqlclan){
+  global $dbx;
   $query="update Clans set $sqlvar='$sqlvalue' where cid=$sqlclan";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function sqlK($sqlvar,$sqlvalue,$sqlloc){
+  global $dbx;
   $query="update Kingdoms set $sqlvar='$sqlvalue' where kd_loc=$sqlloc";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 function clanp($clvl){
   $cp = 0; 
@@ -151,11 +157,12 @@ function clanp($clvl){
 }
 
 function accn($sqlid){
+  global $dbx;
   $query="Select accx from Inventory where Id = $sqlid";
-  $result=mysql_query($query); $row=mysql_fetch_row($result); $accx=$row[0];
+  $result=mysqli_query($dbx, $query); $row=mysqli_fetch_row($result); $accx=$row[0];
   if($accx>0){
     $query="Select i$accx from Inventory where Id = $sqlid";
-    $result=mysql_query($query); $row=mysql_fetch_row($result); $accs=$row[0];
+    $result=mysqli_query($dbx, $query); $row=mysqli_fetch_row($result); $accs=$row[0];
     return $accs;
   }else{
     return 0;
@@ -168,13 +175,14 @@ function getPartialIp($ip)
 }
 
 function getName($byid){
+  global $dbx;
   if ($byid == 0){
   	$playername = "";
   } else {
   	$query="select name from Players where Id = $byid";
- 	$result=mysql_query($query);
- 	if (mysql_num_rows($result)==1) {
- 		$row=mysql_fetch_row($result);
+ 	$result=mysqli_query($dbx, $query);
+ 	if (mysqli_num_rows($result)==1) {
+ 		$row=mysqli_fetch_row($result);
  		$playername=$row[0];
  	} else {
  		$playername="";
@@ -184,24 +192,26 @@ function getName($byid){
 }
 
 function getPKTag($byid){
+  global $dbx;
 	$pktag="";
 	$query="select pktag from PKTag where Id = $byid";
-  $result=mysql_query($query);
-  if(mysql_num_rows($result)==1){
-  	$row=mysql_fetch_row($result);
+  $result=mysqli_query($dbx, $query);
+  if(mysqli_num_rows($result)==1){
+  	$row=mysqli_fetch_row($result);
   	$pktag = $row[0];
   }
   return $pktag;
 }
 
 function getIdByLogin($bylogin){
+  global $dbx;
   if (trim($bylogin) == ""){
   	$playerid = -1;
   } else {
   	$query="select Id from Players where login = '$bylogin'";
- 	$result=mysql_query($query);
- 	if (mysql_num_rows($result)==1) {
- 		$row=mysql_fetch_row($result);
+ 	$result=mysqli_query($dbx, $query);
+ 	if (mysqli_num_rows($result)==1) {
+ 		$row=mysqli_fetch_row($result);
  		$playerid=$row[0];
  	} else {
  		$playerid=-1;
@@ -223,8 +233,11 @@ function kingdomGifts($logtext) {
 }
 
 function writeLogFile($logtext, $filename) {
-   $fp = fopen("/var/www/shimlar.com/logs/".$filename,"a");
-   // $fp = false;
+   $logDir = getenv('LOG_DIR') ?: '/var/log/shimlar';
+   if (!is_dir($logDir)) {
+       @mkdir($logDir, 0777, true);
+   }
+   $fp = fopen($logDir."/".$filename,"a");
    if ($fp)
    {
       flock($fp,2);
@@ -254,7 +267,5 @@ function is_url($url) {
         return true; 
     } 
 }
-
-
 
 ?>

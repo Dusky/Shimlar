@@ -9,11 +9,11 @@ init_dbx();
 //print "10 = Mods; 11 = Rp Mods; 12 = Rp Arch; 20 = Arch.<br>";
 
   $query="Select name,channels from Players where channels in (10,11,12,20)";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
 
   for($i=0; $i<$a1; $i++) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname=$row[0];
     
     switch($row[1]){

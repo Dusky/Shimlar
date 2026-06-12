@@ -1,7 +1,9 @@
 <?php
+
+global $dbx;
                  $query="Select quests,qhd from Players where Id = $Id";
-                 if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-                   extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+                 if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+                   extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                    if ($tgt_qhd == 0) {
                    	$qinfo = "now!";
                    } else {

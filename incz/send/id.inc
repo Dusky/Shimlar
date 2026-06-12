@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
             $tgt=strstr($cinput," ");
             $tgt=ucwords(trim($tgt));
  //           if(strtolower($tgt)=="toshax" && $channels!=20 && $channels!=12){
@@ -22,15 +24,15 @@
 //              $chatresult="Be happy for the rest of your life after a lobotomy.";						
             }else {
               $query="Select Id, name as nimi,surname,banned,(UNIX_TIMESTAMP( ) - UNIX_TIMESTAMP( ax_time )  ) as aika from Players where name='$tgt'";
-              if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-                extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+              if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+                extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                 $query="Select S.clan,S.race,S.lvl,S.align,S.exp,S.health,S.tstatus, P.Name as partner from Stats S left outer join Wedding W on W.pId1 = S.Id and W.Status = 1 left outer join Players P on W.pId2 = P.Id where S.Id = $tgt_Id";
-                $result=mysql_query($query);
-                extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+                $result=mysqli_query($dbx, $query);
+                extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                 if($tgt_clan>1){
                   $query="Select cname from Clans where cid=$tgt_clan";
-                  $result=mysql_query($query);
-                  extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+                  $result=mysqli_query($dbx, $query);
+                  extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                 }
                 $tgt_gender="Male";
                 if($tgt_race>=100){

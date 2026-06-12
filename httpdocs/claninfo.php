@@ -10,13 +10,13 @@ if (is_numeric($id)) {
 
   		$query="Select P.name,S.lvl,S.exp from Players P, Stats S where P.channels != 12 and P.channels != 20 and P.banned!=100 and S.Clan = $id and S.Id = P.Id order by P.name ";
 
-  		$result=mysql_query($query);
+  		$result=mysqli_query($dbx, $query);
 
-  		$a1=mysql_num_rows($result);
+  		$a1=mysqli_num_rows($result);
 
   		for($i=0; $i<$a1; $i++) {
 
-    			$row=mysql_fetch_row($result);
+    			$row=mysqli_fetch_row($result);
 
     			$pname[$i]=$row[0];
 

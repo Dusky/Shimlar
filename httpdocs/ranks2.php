@@ -23,10 +23,10 @@ if($toplist=="exp") {
  }else{
    $query="Select Players.name,Stats.race,Stats.lvl,Stats.exp from Players, Stats where Players.name=Stats.name and (Players.channels !=20 and Players.channels !=12 and Players.banned!=100 and (Stats.race=$rt or Stats.race=$rt+100)) and Stats.tstatus = 0 order by Stats.lvl desc,Stats.exp desc limit 50";
  }
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $prace[$i]=$row[1];
     $plvl[$i]=$row[2];
@@ -44,10 +44,10 @@ if($toplist=="exp") {
  }else{
    $query="Select Players.name,Stats.race,Stats.banked from Players,Stats where Players.name=Stats.name and Players.channels !=20 and Players.channels !=12 and Players.banned!=100 and (Stats.race=$rt or Stats.race=$rt+100) and Stats.tstatus = 0 order by Stats.banked desc limit 50";
  }
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $prace[$i]=$row[1];
     $pbanked[$i]=$row[2];
@@ -60,10 +60,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="good") {
   $query="Select Players.name,Stats.race,Stats.align from Players,Stats where Players.name=Stats.name and Players.channels !=20 and Players.channels !=12 and Players.banned!=100 and Stats.lvl > 99 order by Stats.align desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $prace[$i]=$row[1];
     $palign[$i]=$row[2];
@@ -76,10 +76,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="evil") {
   $query="Select Players.name,Stats.race,Stats.align from Players,Stats where Players.name=Stats.name and Players.channels !=20 and Players.channels !=12 and Players.banned!=100 and Stats.lvl > 99 order by Stats.align asc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $prace[$i]=$row[1];
     $palign[$i]=$row[2];
@@ -92,10 +92,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="quest") {
   $query="Select name,quests from Players where quests>0 and banned!=100 order by quests desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $pquest[$i]=$row[1];
   }
@@ -107,10 +107,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="muted") {
   $query="Select Players.name,Players.mhd,Stats.lvl from Players,Stats where Players.name=Stats.name and Players.channels=66 and Players.banned!=100 order by Players.mhd desc,Stats.exp asc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $plvl[$i]=$row[1];
   }
@@ -122,10 +122,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="mods") {
   $query="Select name,channels from Players where (channels = 10 OR  channels = 11) and ((now()-Players.ax_time)<500) order by name asc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $pchannel[$i]=$row[1];
   }
@@ -137,10 +137,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="qdelay") {
   $query="Select name,qhd from Players where qhd>0 and banned!=100 order by qhd asc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $pquest[$i]=$row[1];
     if ($pquest[$i]=="0") {
@@ -155,10 +155,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="jail") {
   $query="Select name,jhd from Players where loc_zone=18 and banned!=100 order by name desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $plvl[$i]=$row[1];
   }
@@ -170,10 +170,10 @@ if($toplist=="exp") {
   print "</script>";
 }else if($toplist=="clan") {
   $query="Select cname,cpower,cleader,cleader2,cbonus from Clans where cpower>0 and cturn = 0 order by cpower desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $cpower[$i]=$row[1];
     $cl1[$i]=$row[2];
@@ -191,10 +191,10 @@ if($toplist=="exp") {
   print "</script>";
 }else if($toplist=="clant") {
   $query="Select cname,cpower,cleader,cleader2,cbonus from Clans where cpower>0 and cturn = 1 order by cpower desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $cpower[$i]=$row[1];
     $cl1[$i]=$row[2];
@@ -212,10 +212,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="married") {
   $query="select P1.Name,P2.Name from Players P1, Players P2, Wedding W where W.Status=1 and W.pId1 = P1.Id and W.pId2 = P2.Id order by W.Ts desc";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $race[$i]=$row[1];
   }
@@ -227,10 +227,10 @@ if($toplist=="exp") {
   print "</script>";
 } else if($toplist=="pk") {
   $query="select S.name,S.PKill from Stats S,Players P where P.banned!=100 and P.Id = S.Id order by PKill desc limit 50";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $race[$i]=$row[1];
   }
@@ -246,10 +246,10 @@ if($toplist=="exp") {
 	} else {
 		$query="select f.Name,f.Fame,f.Lvl from Fame f inner join Players p on p.Id = f.Id inner join Stats s on s.Id = f.Id where p.banned <> 100 and (s.race=$rt or s.race=$rt+100) order by f.Fame desc limit 50";
 	}
-	$result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+	$result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $race[$i]=$row[1];
     $lvl[$i]=$row[2];

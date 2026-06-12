@@ -1,7 +1,9 @@
 <?php
+
+global $dbx;
    $query="select PKill from Stats where Id = $Id";
-   $result=mysql_query($query);
-   extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"this");
+   $result=mysqli_query($dbx, $query);
+   extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"this");
    if ($this_PKill == 0) {
     $chatresult="You did not kill anyone yet.";
    } else {

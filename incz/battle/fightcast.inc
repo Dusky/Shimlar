@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 function wep_attack($who,$dt,$wp,$str,$wm,$wm_max,$chit,$ap,$hp,$am,$am_max){
   global $btlstr,$damage,$lastmon,$lvl,$spec_ma;
   $btlstr.="$who";$xm=0;
@@ -153,17 +155,17 @@ function getRndSeq() {
 }
 
   $query="Select channels,fire_m,cold_m,air_m,arcane_m,sword_m,axe_m,staff_m,mace_m,armor_m,double_m,qnum,qhd from Players where Id = $Id";
-  $result=mysql_query($query);extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
   $query="Select clan,race,gold,str,dex,vit,ntl,wis,health,align,opponent,e_health,tef,tfc,tstatus,lvl from Stats where Id = $Id";
-  $result=mysql_query($query);extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
   $race%=100;
   $query="Select * from Inventory where Id = $Id";
-  $result=mysql_query($query);extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
   $invlist=array($i1,$i2,$i3,$i4,$i5,$i6,$i7,$i8,$i9,$i10,$i11,$i12,$i13,$i14,$i15,$i16,$i17,$i18,$i19,$i20,$i21,$i22,$i23,$i24,$i25,$i26,$i27,$i28,$i29,$i30);
   if($qnum !=0){
     $query="Select * from Quests where qnum=$qnum";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result));
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result));
     }
   }
   // anti macro: send blank pm
@@ -207,23 +209,23 @@ function getRndSeq() {
   switch($macroRand) {
   	case 25:
   		$query="Insert into Messages values($Id,'".$rndSender."','".mt_rand()."',5,now())";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   		break;
   	case 26:
   		$query="Insert into Messages values($Id,'".$rndSender."','".getRndSeq()." ".getRndSeq()."',5,now())";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   		break;
   	case 27:
   		$query="Insert into Messages values($Id,'".$rndSender."','".getRndSeq()." ".getRndSeq()." ".getRndSeq()."',5,now())";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   		break;
   	case 28:
   		$query="Insert into Messages values($Id,'".$rndSender."','".getRndSeq()." ".getRndSeq()." ".getRndSeq()." ".getRndSeq()."',5,now())";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   		break;
   	case 29:
   		$query="Insert into Messages values($Id,'".$rndSender."','".getRndSeq()." ".getRndSeq()." ".getRndSeq()." ".getRndSeq()." ".getRndSeq()."',5,now())";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
   		break;
   	}
   }
@@ -232,8 +234,8 @@ function getRndSeq() {
     include "clan1.inc";
   }
   $query="Select * from Zones where znum=$loc_zone";
-  $result=mysql_query($query);
-  extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result));
   $stuff_here=0;
   include "tele.inc";
   if($lastmon==1000){
@@ -268,8 +270,8 @@ function getRndSeq() {
     $duel_error=1;
   }else{
     $query="Select fire_max,cold_max,air_max,arcane_max,sword_max,axe_max,staff_max,mace_max,armor_max from Races where rid=$race";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     $tgt_mastery1=0;$tgt_mastery2=0;$tgt_mastery3=0;$tgt_mastery4=0;$tgt_mastery5=0;
     $initb=0;$tgt_initb=0;
     if($lastmon<1000){
@@ -734,7 +736,7 @@ function getRndSeq() {
   if ($lvl >= 25) 
   {
   	$query="Update Players set sword_m=$sword_m,axe_m=$axe_m,staff_m=$staff_m,mace_m=$mace_m,armor_m=$armor_m,double_m=$double_m,fire_m=$fire_m,cold_m=$cold_m,air_m=$air_m,arcane_m=$arcane_m where Id = $Id";
-  	mysql_query($query);
+  	mysqli_query($dbx, $query);
 	}
   if($acc_num==4){
     $vit-=1000;
@@ -748,21 +750,21 @@ function getRndSeq() {
   $e_health=max($e_health,0);
   if($lastmon<1000){
     $query="Update Stats set exp=$exp,health=$health,e_health=$e_health,gold=$gold,fight_time=now() where Id = $Id";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Update Players set ax_time=now() where Id = $Id";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   }else{
    	$query="Update Stats set exp=$exp,health=$health,gold=$gold,fight_time=now(),e_health=0 where Id = $Id";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Update Players set ax_time=now() where Id = $Id";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   }
   if($lastmon==999){
     if($e_health>0){
       $btlstr.="b,$e_health,";
     }
     $query="Update Hunts set health=$e_health where bzone=$loc_zone";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   }
   if($lastmon==1000 && $duel_error==0){
     include "pvp6.inc";

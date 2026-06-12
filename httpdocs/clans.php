@@ -8,16 +8,16 @@ if($cx=="") {
 if($cx!="all") {
   if($cx!="a"){
     $query="Select cid from Clans where cname='$cx'";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     $query="Select name,lvl from Stats where clan=$cid order by lvl desc,exp desc limit 150";
   }else{
     $query="Select name,lvl from Stats where clan=1 order by lvl desc,exp desc limit 150";
   }
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $plvl[$i]=$row[1];
   }
@@ -30,10 +30,10 @@ if($cx!="all") {
   print "</script>";
 }else{
   $query="Select cname,cpower,cleader,cleader2,cbonus,cid from Clans where cpower>0 order by cpower desc limit 150";
-  $result=mysql_query($query);
-  $a1=mysql_num_rows($result);
+  $result=mysqli_query($dbx, $query);
+  $a1=mysqli_num_rows($result);
   for($i=0; $i<$a1; ++$i) {
-    $row=mysql_fetch_row($result);
+    $row=mysqli_fetch_row($result);
     $pname[$i]=$row[0];
     $cpower[$i]=$row[1];
     $cl1[$i]=$row[2];

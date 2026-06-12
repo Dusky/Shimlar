@@ -7,8 +7,8 @@ function questproc($qdiff){
 for($lx=0;$lx<6;$lx++){
   srand(make_seed());
   $query="select max(isqzone)as maximum from Zones";
-  $result=mysql_query($query);
-  $row = mysql_fetch_array($result, MYSQL_ASSOC);
+  $result=mysqli_query($dbx, $query);
+  $row = mysqli_fetch_array($result, MYSQL_ASSOC);
  
   $layerArray = array();
   
@@ -30,8 +30,8 @@ for($lx=0;$lx<6;$lx++){
     //print ("extended Layer No. $text in $zoneID<br>");
   }
   $query="Select zbase_stats, zbase_eq, zmonsters, mlist, minqlvl, qincrement, qrange, expFactor, goldFactor from Zones where znum=$zoneID";
-  $result=mysql_query($query);
-  extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result));
   $qmon=rand(0,$zmonsters-1);
   $minlvl = $minqlvl + $qmon*$qincrement;
   $maxlvl = $minlvl + $qrange;
@@ -91,21 +91,21 @@ for($lx=0;$lx<6;$lx++){
   $qmon+=(rand(1,14)*20);
 //  $query="Insert into Quests values($qmon,$mlist,$zoneID,$qexp+10000,$qgold+5000,$qitem,'x',$qnum,$maxlvl,,$minlvl)";
 //  echo ($query);
-//  mysql_query($query);
+//  mysqli_query($dbx, $query);
 
   $query="Select qnum from Quests order by qnum desc limit 1";
-  $result=mysql_query($query);
-  if($result==TRUE && mysql_num_rows($result)==1){
-    extract(mysql_fetch_array($result)); $qnum++;
+  $result=mysqli_query($dbx, $query);
+  if($result==TRUE && mysqli_num_rows($result)==1){
+    extract(mysqli_fetch_array($result)); $qnum++;
     $query="Select count(*) as qz from Quests";
-    $result=mysql_query($query); extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
   } else {
     $qnum=1;
   }
 //  $qmon+=(rand(1,10)*20);
   $query="Insert into Quests values($qmon,$mlist,$zoneID,$qexp+10000,$qgold+5000,$qitem,'x',$qnum,$maxlvl,0,$minlvl)";
   if($qz<15){
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     
   }
 }
@@ -120,8 +120,8 @@ for($lx=0;$lx<6;$lx++){
 // displays the number of currently online players in general and sales chat
 function onlinePlayers() {
     $query="Select count(Id) as pon from Players where (now()-ax_time)<200";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     inschat("chat1","Shimlar","has $pon players online!",32);
     inschat("chat3","Shimlar","has $pon players online!",32);
   }
@@ -130,46 +130,46 @@ function onlinePlayers() {
 //increases quest life
 function increaseQuestLife() {
     $query="Update Quests set qlife=qlife+1";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Update Players set qhd=qhd-1 where qhd>0";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Update Inventory set tradex=0";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="update Inventory set checked = 0 where checked = 1";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Delete from Market where tto=tto";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Unlock tables";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
 }
 
 //deletes quests after a certain time is over  (3 hours)
 function deleteQuests() {
     $query="Delete from Quests where qlife>=3";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     for($cx=1;$cx<5;$cx++){
       $query="select msgnum from chat$cx order by msgnum desc limit 1";
-      $result=mysql_query($query); $row=mysql_fetch_row($result); $msgnum_max=$row[0];
+      $result=mysqli_query($dbx, $query); $row=mysqli_fetch_row($result); $msgnum_max=$row[0];
       $query="delete from chat$cx where msgnum<$msgnum_max-40";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
     }
     $query="Unlock tables";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Lock Tables Players WRITE,Inventory WRITE,Market WRITE,Quests WRITE,Stats WRITE";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
 }
 
 
 //reset players from expired quests
 function resetPlayers() {
     $query="Select qnum from Quests where qlife>=3";
-    $result=mysql_query($query);
-    $c1=mysql_num_rows($result);
+    $result=mysqli_query($dbx, $query);
+    $c1=mysqli_num_rows($result);
     for($c2=0;$c2<$c1;$c2++){
-          $row=mysql_fetch_row($result);
+          $row=mysqli_fetch_row($result);
           $qnum=$row[0];
           $query="Update Players set qnum=0 where qnum=$qnum";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
     }
 }
 
@@ -183,10 +183,10 @@ function make_seed(){
 
 function generateLayer($layerNum){
   $query="Select znum from Zones where isqzone = $layerNum";
-  $result=mysql_query($query);
+  $result=mysqli_query($dbx, $query);
   $zCount = 0;
   $idArray = array();
-  while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+  while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
       $idArray[$zCount] = $row["znum"];
       $zCount++;
   }
@@ -196,21 +196,21 @@ function generateLayer($layerNum){
 function HandOutTurns() {
 	$query="select s.Id, s.turns from Players p, Stats s where p.channels <> 66 and p.banned < 100 and p.Id = s.Id and s.tstatus = 1 and s.turns <> 5400";
 	// select id of needed chars
-	$result=mysql_query($query);
-  $c1=mysql_num_rows($result);
+	$result=mysqli_query($dbx, $query);
+  $c1=mysqli_num_rows($result);
   for($c2=0;$c2<$c1;$c2++){
- 		$row=mysql_fetch_row($result);
+ 		$row=mysqli_fetch_row($result);
     $playerId=$row[0];
     $playerTurns=$row[1];
     if ($playerTurns < 5356) 
     {
     	$query="Update Stats set turns=turns+45 where Id = $playerId";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
     } 
     else 
     {
     	$query="Update Stats set turns=5400 where Id = $playerId";
-     	mysql_query($query);
+     	mysqli_query($dbx, $query);
     }           
   }
 }

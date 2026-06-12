@@ -12,10 +12,10 @@ if(isset($_GET["l"]) && isset($_GET["p"])) {
 	if (strlen($pass)>0){
 		$pid = (int)$user;
 		$query="Select name as nimi from Players where Id=$pid and password='$pass'";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-			$row=mysql_fetch_row($result);
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+			$row=mysqli_fetch_row($result);
 			$query="insert into Modactions values('Lord A 2', '$row[0]', 'SCRIPT', now())";
-			mysql_query($query);
+			mysqli_query($dbx, $query);
     }
   }
 	close_dbx();

@@ -1,17 +1,19 @@
 <?php
+
+global $dbx;
                  $query="Select clan from Stats where Id = $Id";
-                 if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-                   extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"this");
+                 if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+                   extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"this");
                    if ($this_clan != 0) {
                    	$query ="select c.cname,c.cleader,count(s.Id) as clannies, k.kd_gold, k.kd_tax, k.kd_loc from Stats s, Clans c, Kingdoms k where c.cid = $this_clan and s.clan = $this_clan and k.kd_clan =c.cid group by c.cid";
-                   	$result=mysql_query($query);
+                   	$result=mysqli_query($dbx, $query);
                    	$kd = true;
-                   	if (mysql_num_rows($result)==0) {
+                   	if (mysqli_num_rows($result)==0) {
                    		$kd = false;
                    		$query="select c.cname,c.cleader,count(s.Id) as clannies from Stats s, Clans c where c.cid = $this_clan and s.clan = $this_clan group by c.cid";
-                   		$result=mysql_query($query);
+                   		$result=mysqli_query($dbx, $query);
                    	}
-                   	extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"this");
+                   	extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"this");
                    	if ($kd) {
                    		$this_kd_loc = $this_kd_loc/10;
                    		$this_kd_gold = number_format($this_kd_gold);

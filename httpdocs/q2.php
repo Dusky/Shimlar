@@ -25,8 +25,8 @@ for($lx=0;$lx<4;$lx++){
     $qzone=rand(0,13); $qtype=rand(1,2); $qlevel=200;
   }
   $query="Select zbase_stats, zbase_eq, zmonsters, mlist from Zones where znum=$qzone";
-  $result=mysql_query($query);
-  extract(mysql_fetch_array($result));
+  $result=mysqli_query($dbx, $query);
+  extract(mysqli_fetch_array($result));
   $qmon=rand($qm_min,$zmonsters-1);
   $qprice=$zbase_stats*$zbase_eq*pow(1.3,$qmon)*4;
   if($qtype==1){
@@ -79,56 +79,56 @@ for($lx=0;$lx<4;$lx++){
     }
   }
   $query="Select qnum from Quests order by qnum desc limit 1";
-  $result=mysql_query($query);
-  if($result==TRUE && mysql_num_rows($result)==1){
-    extract(mysql_fetch_array($result)); $qnum++;
+  $result=mysqli_query($dbx, $query);
+  if($result==TRUE && mysqli_num_rows($result)==1){
+    extract(mysqli_fetch_array($result)); $qnum++;
     $query="Select count(*) as qz from Quests";
-    $result=mysql_query($query); extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query); extract(mysqli_fetch_array($result));
   } else {
     $qnum=1;
   }
   $qmon+=(rand(1,7)*20);
   $query="Insert into Quests values($qmon,$mlist,$qzone,$qexp,$qgold,$qitem,'x',$qnum,$qlevel,0)";
   if($qz<10){
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   }
 }
 $query="Select qnum from Quests where qlife>=4";
-$result=mysql_query($query);
-$c1=mysql_num_rows($result);
+$result=mysqli_query($dbx, $query);
+$c1=mysqli_num_rows($result);
 for($c2=0;$c2<$c1;$c2++){
-  $row=mysql_fetch_row($result);
+  $row=mysqli_fetch_row($result);
   $qnum=$row[0];
   $query="Update Players set qnum=0 where qnum=$qnum"; 
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 
 $query="Delete from Quests where qlife>=5"; 
-mysql_query($query);
+mysqli_query($dbx, $query);
 for($cx=1;$cx<5;$cx++){
   $query="select msgnum from chat$cx order by msgnum desc limit 1";
-  $result=mysql_query($query); $row=mysql_fetch_row($result); $msgnum_max=$row[0];
+  $result=mysqli_query($dbx, $query); $row=mysqli_fetch_row($result); $msgnum_max=$row[0];
   $query="delete from chat$cx where msgnum<$msgnum_max-40";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
 }
 $query="Unlock tables";
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Lock Tables Players WRITE,Inventory WRITE,Market WRITE,Quests WRITE";
-mysql_query($query);
+mysqli_query($dbx, $query);
 
 $query="Update Quests set qlife=qlife+1"; 
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Update Players set qhd=qhd-1 where qhd>0";
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Update Inventory set tradex=0"; 
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Delete from Market where tto=tto"; 
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Unlock tables";
-mysql_query($query);
+mysqli_query($dbx, $query);
 $query="Select count(Id) as pon from Players where (now()-ax_time)<200";
-$result=mysql_query($query); 
-extract(mysql_fetch_array($result));
+$result=mysqli_query($dbx, $query); 
+extract(mysqli_fetch_array($result));
 inschat("chat1","Shimlar","has $pon players online!",27);
 inschat("chat3","Shimlar","has $pon players online!",27);
 }

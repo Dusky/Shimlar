@@ -1,5 +1,7 @@
 <?php
 
+global $dbx;
+
     $x=0;
 
     for($i=0;$i<30;++$i){
@@ -112,7 +114,7 @@
 
       					$query="update Stats set turns = turns + $turnUp where Id = $Id";
 
-      					mysql_query($query);
+      					mysqli_query($dbx, $query);
 
       				}
 

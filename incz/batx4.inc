@@ -1,5 +1,7 @@
 <?php
 
+global $dbx;
+
 $btlstr="";$damage=0;
 
 function batproc($l,$p,$a,$k,$m){
@@ -16,35 +18,35 @@ if(is_numeric($l) && $REQUESTURI=="/battle4.php"){
 	if(tarkista($p) && tarkista($a) && tarkista($m) && $k != -1){
 		$fmt=1;$kd_tax=0;$action=$a;
 		$query="Lock Tables Players WRITE,Stats WRITE,Inventory WRITE,Zones WRITE,Messages WRITE,Quests WRITE,Races WRITE,Hunts WRITE,chat1 WRITE,chat4 WRITE,Clans WRITE,Kingdoms WRITE,Modactions WRITE,PKTag READ, PKLog WRITE";
-		mysql_query($query);
+		mysqli_query($dbx, $query);
 		
 		$query="Select Id,password,loc_zone,loc_x,loc_y,lastaction,banned,name as pname from Players where Id = $l";
-		if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-			extract(mysql_fetch_array($result));
+		if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+			extract(mysqli_fetch_array($result));
 			
 			if($p==$password && $banned !=100){
 				srand(make_seed());
 				$bdelay=0;$aika=100;$lastfight=0;$x=0;$y=0;$special1=0;$drop_bonus=0;
 				
 				$query="Select freelvl,lvl,exp,fmt,status,turns,tstatus,health,e_health,gold,align from Stats where Id=$Id";
-				$result=mysql_query($query);extract(mysql_fetch_array($result));
+				$result=mysqli_query($dbx, $query);extract(mysqli_fetch_array($result));
 				$lastmon=$status;
 
 /*				
 				if($lastmon==1000 && ($action=="f"||$action=="c")){
 					$query="Select(now()-fight_time) as aika, (UNIX_TIMESTAMP( ) - UNIX_TIMESTAMP( pk_time ))  as pkd from Stats where Id=$Id";
-					$result=mysql_query($query);
-					extract(mysql_fetch_array($result));
+					$result=mysqli_query($dbx, $query);
+					extract(mysqli_fetch_array($result));
 				}else{
 					$query="Select(now()-fight_time) as aika from Stats where Id=$Id";
-					$result=mysql_query($query);
-					extract(mysql_fetch_array($result));
+					$result=mysqli_query($dbx, $query);
+					extract(mysqli_fetch_array($result));
 				}
 */
 				if($lastmon==1000 && ($action=="f"||$action=="c")){
 					$query="Select (UNIX_TIMESTAMP( ) - UNIX_TIMESTAMP( pk_time ))  as pkd from Stats where Id=$Id";
-					$result=mysql_query($query);
-					extract(mysql_fetch_array($result));
+					$result=mysqli_query($dbx, $query);
+					extract(mysqli_fetch_array($result));
 				}
 				
 				switch($action)
@@ -65,13 +67,13 @@ if(is_numeric($l) && $REQUESTURI=="/battle4.php"){
 				$ip=$REMOTEADDR;
 				
 				$query="Update Stats set status=$lastmon where Id=$Id";
-				mysql_query($query);
+				mysqli_query($dbx, $query);
 				
 				$query="Update Players set lastaction='$action',wrong_pw=0,last_ip='$ip' where Id=$Id";
-				mysql_query($query);
+				mysqli_query($dbx, $query);
 				
 				$query="Unlock Tables";
-				mysql_query($query);
+				mysqli_query($dbx, $query);
 				
 				if($action=="n")
 					print "x10($turns);";
@@ -107,15 +109,15 @@ if(is_numeric($l) && $REQUESTURI=="/battle4.php"){
 				++$wrong_pw;
 				$l = tarkista(getName($l));
 				$query="Update Players set wrong_pw=$wrong_pw where name='$l'";
-				mysql_query($query);
+				mysqli_query($dbx, $query);
 			
 				if($wrong_pw>9){
 					$ip=$REMOTEADDR;
 					if($ip !=''){
 						$query="Insert into Ipban values('$ip',now(),'$l')";
-						mysql_query($query);
+						mysqli_query($dbx, $query);
 						$query="Update Players set wrong_pw=0 where name='$l'";
-						mysql_query($query);
+						mysqli_query($dbx, $query);
 					}else{
 						print "javascript:alert(\"Stop guessing passwords, your IP will be banned.\");\n";
 					}

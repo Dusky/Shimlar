@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 	if($channels==20||$channels==12||$channels==10){
 		$tgt=strstr($cinput," ");
             	$tgt=ucwords(trim($tgt));
@@ -31,17 +33,17 @@
             	}
             	if (!($skip)) {			
 			$query = "update Stats set pk_time=now() where Id = $Id";
-                        mysql_query($query);
+                        mysqli_query($dbx, $query);
                         $query="Select P.name,S.lvl,S.exp,S.gold,P.last_ip from Players as P,Stats as S where (((now()-P.Ax_time)<200) && (P.channels not in (12,20)) && (P.banned!=100) && (P.Id = S.Id) && ((P.channels!=66)&&(P.mhd=0))) order by $orderby desc limit 200";
-			$result=mysql_query($query);
-  			$a1=mysql_num_rows($result);
+			$result=mysqli_query($dbx, $query);
+  			$a1=mysqli_num_rows($result);
   			$chatresult="<p align='left'>The $a1 people online (excluded permamuted) on $ts sorted on $tgt are: <br>";
   			$j=0;
   			$divider="<tr><th>Nr.</th><th>Name</th><th>Level</th><th>Exp.</th><th>Gold</th><th>IP</th></tr>";
   			$chatresult.="<table align='left' style={width:10px;}>";
   			$chatresult=$chatresult.$divider;
   			for($i=0; $i<$a1; $i++) {
-    				$row=mysql_fetch_row($result);
+    				$row=mysqli_fetch_row($result);
     				$tgt_name[$i]=str_replace("'","\'",$row[0]);
     				$tgt_lvl[$i]=$row[1];
     				$tgt_exp[$i]=$row[2];

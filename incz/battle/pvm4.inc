@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 	if($e_health<=0){
   	if(rand(1,150)==11){
   		$fmt=rand(1,22);
@@ -15,7 +17,7 @@
   			$btlstr.="sg,";
   			$rndGold = rand(500,1000)*$lvl;
   			$query="update Stats set banked=banked+$rndGold where Id = $Id";
-  			mysql_query($query);
+  			mysqli_query($dbx, $query);
   		} else {
  				$gem_chance=rand(1,Round(1500/$rndFactor));
   			if($gem_chance<(3+$drop_bonus)){
@@ -43,7 +45,7 @@
   	    					$turnUp = rand(1,540);
       						if(($turns+$turnUp)<5400){
     	  						$query="update Stats set turns = turns + $turnUp where Id = $Id";
-      							mysql_query($query);
+      							mysqli_query($dbx, $query);
       							$btlstr.="st,";
       						} else {
       							$btlstr.="s,";
@@ -64,19 +66,19 @@
   	
   	if($qnum>0 && $qmon==$lastmon && $qzone==$loc_zone && $qstatus==0){
   		$query="Update Quests set qstatus=$Id where qnum=$qnum"; 
-  		mysql_query($query);
+  		mysqli_query($dbx, $query);
   		$query="Update Players set qnum=0 where Id!=$Id and qnum=$qnum";
-  		mysql_query($query);
+  		mysqli_query($dbx, $query);
   		if (($turns+270)<5400) {
   			$query="update Stats set turns=turns+270 where Id = $Id";
-  			mysql_query($query);
+  			mysqli_query($dbx, $query);
   		}
   		$qhd+=8;
   		if($cbonus==6){
     		$qhd-=(1*$clx);
   		}
   		$query="update Players set qhd = $qhd, qnum = $qnum where Id = $Id";
-  		mysql_query($query);
+  		mysqli_query($dbx, $query);
   		inschat("chat1",$pname,"$qzone,$qmon,$qmlist",29);
   		inschat("chat4",$pname,"$qzone,$qmon,$qmlist",29);
   		print "mX(19);";
@@ -112,7 +114,7 @@
   			$kd_goldx=round($zbase_gold*($lastmonx+1)*(1+$gold_bonus)*$spec_gold*$kd_tax/100);
   			$gold=$gold+round($zbase_gold*($lastmonx+1)*(1+$gold_bonus)*$spec_gold)-$kd_goldx;
   			$query="Update Kingdoms set kd_gold=kd_gold+$kd_goldx where kd_clan=$clan";
- 				mysql_query($query);
+ 				mysqli_query($dbx, $query);
       }else{
   			$gold=$gold+round($zbase_gold*($lastmonx+1)*(1+$gold_bonus)*$spec_gold);
       }
@@ -124,9 +126,9 @@
     $loc_x=rand(0,$zkoko);$loc_y=rand(0,$zkoko);
   }
   $query="Update Players set loc_x=$loc_x,loc_y=$loc_y where Id=$Id";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   $query="Update Stats set e_health = 0 where Id = $Id";
-  mysql_query($query);
+  mysqli_query($dbx, $query);
   include "tele.inc";
   print "x6($loc_x,$loc_y,$stuff_here,0);";
   print "mX(0);";

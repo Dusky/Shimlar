@@ -1,9 +1,11 @@
 <?php
 
+global $dbx;
+
   $spammer=strstr($cinput," ");
   $spammer=strtolower(trim($spammer));
   $query="Select name from Players where name='$spammer'";
-  if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
+  if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
     $cookieValue = $_COOKIE["pIgnore"];
     if(!(strstr($cookieValue,$spammer))){
       $spammer=ucwords(trim($spammer));

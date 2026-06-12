@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 $a1=0;
 function sproc($l,$p,$k,$target){
 global $REMOTEADDR,$a1;
@@ -12,13 +14,13 @@ $cinput=substr($target,0,min(strlen($target),200));
 if(is_numeric($l)){
 if(tarkista($pword) && tarkista($k)){
   $query="Select Id,ign,password,channels,banned,wrong_pw,name as pname,surname from Players where Id=$l";
-  if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-    extract(mysql_fetch_array($result));
+  if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+    extract(mysqli_fetch_array($result));
     $query="Select clan,lvl,race,align,stopRP,stopSales,banked from Stats where Id = $Id";
-    $result=mysql_query($query);
-    extract(mysql_fetch_array($result));
+    $result=mysqli_query($dbx, $query);
+    extract(mysqli_fetch_array($result));
     $race=($race%100)+40;
-    if(mysql_num_rows($result)==1 && $pword==$password && $banned !=100){
+    if(mysqli_num_rows($result)==1 && $pword==$password && $banned !=100){
       $chatresult="x";$x=0;
       if($lvl>24){
       	if (($stopRP!=0 && $luku1==2) || ($stopSales!=0 && $luku1==3)) {
@@ -51,23 +53,23 @@ if(tarkista($pword) && tarkista($k)){
       print "xA(\"$chatresult\");";
       $ip=$REMOTEADDR;
       $query="Update Players set lastaction='h',ax_time=now(),wrong_pw=0,last_ip='$ip' where Id = $Id";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
     }else if($p !=$password){
       ++$wrong_pw;
       if($wrong_pw>9){
         if($REMOTEADDR !=''){
           $query="Insert into Ipban values('$REMOTEADDR',now(),'$pname')";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="Update Players set wrong_pw=0,banned=100 where name = '$pname'";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="Insert into Modactions values('Password', '$pname', '$wrong_pw', now())";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
         }else {
           print "alert(\"Stop guessing passwords, your IP will be banned.\");\n";
         }
       } else {
       	$query="Update Players set wrong_pw=$wrong_pw where Id = $Id";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
       }
       ep2(0);
     }else if($banned==100){

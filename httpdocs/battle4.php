@@ -29,9 +29,9 @@ if ( $position !== false ) {
   init_dbx();
     $spammer=ucwords(trim(getName($_POST["l"])));
     $query="update Players set banned=100 where Id = ".$_POST["l"];
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     $query="Insert into Modactions values('HTTP Autoban','$spammer','accessing from : ".$_SERVER['HTTP_REFERER']."',now())";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
     close_dbx();
   }
 }

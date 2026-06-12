@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
     if($freelvl>0){
       $nxlvl=0;
     }else{
@@ -21,22 +23,22 @@
     {
     	// new fight has just been pressed - looses gold in hand
     	$query="update Stats set gold = 0 where Id = $Id";
-    	mysql_query($query);
+    	mysqli_query($dbx, $query);
     	$gold = 0;
     } else if ($e_health > 0 && $health > 0) {
     	// in the middle of a fight...
     	$rateLoss = max($e_health,$health)/min($e_health,$health);
 			$gold = $gold - min(intval($gold/$rateLoss),$gold);
 			$query = "update Stats set gold = $gold where Id = $Id";
-			mysql_query($query);
+			mysqli_query($dbx, $query);
     }
     
     if((($turns>0)&&($turns<5401))||($tstatus==0)){
     	if($exp<$nxlvl){
       	$lastmon=$k;$lastfight=0;
       	$query="Select zmonsters, zhunt from Zones where znum=$loc_zone";
-	      $result=mysql_query($query);
-  	    extract(mysql_fetch_array($result));
+	      $result=mysqli_query($dbx, $query);
+  	    extract(mysqli_fetch_array($result));
     	if($lastmon !=999||$zhunt=0){
       	if($lastmon>=$zmonsters){
         	$lastmon=$zmonsters-1;
@@ -57,9 +59,9 @@
         $fmx=$fms[$fmt];
         if($m==$fmx){
           $query="Update Stats set e_health=$e_health,fight_time=now() where Id = $Id";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $query="Update Players set lastaction='$action',ax_time=now() where Id = $Id";
-          mysql_query($query);
+          mysqli_query($dbx, $query);
           $btlstr.="a";
         }else{
           ep2(25);
@@ -68,13 +70,13 @@
       if ($tstatus==1) {
       	$turns=$turns--;
       	$query="update Stats set turns = turns-1 where Id = $Id";
-      	mysql_query($query);
+      	mysqli_query($dbx, $query);
       }
     }else{
 //      $query="update Players set banned=banned+10 where Id = $Id";
-//      mysql_query($query);
+//      mysqli_query($dbx, $query);
 //      $query="insert into Modactions values('A - lvl $lvl', '$pname', 'macroclick?', now())";
-//      mysql_query($query);
+//      mysqli_query($dbx, $query);
       ep2(23);
     }
   }else{
@@ -82,9 +84,9 @@
   		ep2(76);
   	} else if ($turns > 5400) {
   		$query="update Players set banned=100 where Id = $Id";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
       $query="insert into Modactions values('A - turns $turns', '$pname', '+5400 free fights', now())";
-      mysql_query($query);
+      mysqli_query($dbx, $query);
   		ep2(77);
   	}
   }

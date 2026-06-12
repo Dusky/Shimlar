@@ -20,8 +20,8 @@ if ($usepl) {
 	if(tarkista($_POST["pl"])) {
   		$l=ucwords($_POST["pl"]);
   		$query="Select name as nimi, email, password, login from Players where login='$l'";
-  		if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1) {
-    			extract(mysql_fetch_array($result));
+  		if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1) {
+    			extract(mysqli_fetch_array($result));
 					$subject = "Shimlar recovery: $nimi";
 					$message = "Your password for character named $nimi is : $password.\r\n" .
 						"Your login is: $login.\r\n" .
@@ -55,8 +55,8 @@ if ($usepl) {
 	if(tarkista($_POST["cn"])) {
   		$l=ucwords($_POST["cn"]);
   		$query="Select name as nimi, email, password, login from Players where name='$l'";
-  		if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1) {
-    			extract(mysql_fetch_array($result));
+  		if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1) {
+    			extract(mysqli_fetch_array($result));
 					$subject = "Shimlar recovery: $nimi";
 					$message = "Your password for character named $nimi is : $password.\r\n" .
 						"Your login is: $login.\r\n" .

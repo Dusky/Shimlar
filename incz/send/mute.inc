@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 function chat_mute($channels, $pname, $cinput){
   if($channels==10 || $channels==11 || $channels==12 || $channels==20){
     $spammer=strstr($cinput," ");
@@ -13,20 +15,20 @@ function chat_mute($channels, $pname, $cinput){
       $qhd=$mhd*3;
     }
     $query="Select Id,channels,banned from Players where name='$spammer'";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
       if(($tgt_channels<20)&&($tgt_channels!=12)&&($tgt_channels!=10)){ // $channels == 19 must be mutable!
         if($tgt_banned !=100){
           $tgt_banned+=10;
           if ($tgt_banned==100){
             $query="Insert into Modactions values('MODBAN','$spammer','mod action ban',now())";
-            mysql_query($query);
+            mysqli_query($dbx, $query);
             }
           }
         $query="Update Players set loc_zone=18,loc_x=1,loc_y=1,channels=66,banned='$tgt_banned',mhd='$mhd',qhd='$qhd',jhd='$mhd' where Id = $tgt_Id";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $query="Insert into Modactions values('$pname','$spammer','muted/jailed $mhd',now())";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         if ($mhd==1) {
           $mhdd = "shuts up for 1 hour.";
         } else {
@@ -34,7 +36,7 @@ function chat_mute($channels, $pname, $cinput){
         }
         inschat("chat$luku1",$spammer,"$mhdd",27);
         $query="Insert into Messages values($tgt_Id,'$pname','muted you for $mhd hours.',26,now())";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         $chatresult="Player $spammer muted for $mhd h.";
         $chatmsg = "I muted player $spammer for $mhd h.";
         inschat("chat1",$pname,$chatmsg,30);

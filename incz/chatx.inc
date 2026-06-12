@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
 function chatproc($l,$p){
 global $special1,$special2,$special3,$special4,$REMOTE_ADDR;
 $special1=0;$special2=0;$special3=0;$special4=0;
@@ -11,11 +13,11 @@ if(is_numeric($l)){
     $special1=0;$special2=0;
     srand(make_seed());
     $query="Select Id,name,password,channels,banned,wrong_pw,lastaction from Players where Id=$l";
-    if(($result=mysql_query($query))==TRUE && mysql_num_rows($result)==1){
-      extract(mysql_fetch_array($result));
+    if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
+      extract(mysqli_fetch_array($result));
       $query="Select clan,race from Stats where Id = $Id";
-      $result=mysql_query($query);
-      extract(mysql_fetch_array($result));
+      $result=mysqli_query($dbx, $query);
+      extract(mysqli_fetch_array($result));
       $race%=100;
 /*      if($race>=20){
         $race-=20;
@@ -29,20 +31,20 @@ if(is_numeric($l)){
         valmista_chat($name,$cx_size,$channels,$clan,$race,$Id);
         if($special2==1 || $special3==1){
           $query="Select exp,gold,health from Stats where Id = $Id";
-          $result=mysql_query($query);
-          extract(mysql_fetch_array($result));
+          $result=mysqli_query($dbx, $query);
+          extract(mysqli_fetch_array($result));
           print "x1($exp,$gold,$health);";
         }
         if($special1==1 || $special3==1){
           $query="Select gold,banked from Stats where Id = $Id";
-          $result=mysql_query($query);
-          extract(mysql_fetch_array($result));
+          $result=mysqli_query($dbx, $query);
+          extract(mysqli_fetch_array($result));
           print "x4($gold,$banked);";
         }
         if($special2==1 || $special3==1){
           $query="Select * from Inventory where Id = $Id";
-    	  $result=mysql_query($query);
-    	  extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"my");
+    	  $result=mysqli_query($dbx, $query);
+    	  extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"my");
     	  $invlist=array($my_i1,$my_i2,$my_i3,$my_i4,$my_i5,$my_i6,$my_i7,$my_i8,$my_i9,$my_i10,$my_i11,$my_i12,$my_i13,$my_i14,$my_i15,$my_i16,$my_i17,$my_i18,$my_i19,$my_i20,$my_i21,$my_i22,$my_i23,$my_i24,$my_i25,$my_i26,$my_i27,$my_i28,$my_i29,$my_i30);
           $imsg="";
           for($i=0;$i<30;$i++){
@@ -55,9 +57,9 @@ if(is_numeric($l)){
         }
         if($special4==1){
           $query="Select * from Clans where cid=$clan";
-          $result=mysql_query($query);
-          if($result==TRUE and mysql_num_rows($result)>0){
-            extract(mysql_fetch_array($result));
+          $result=mysqli_query($dbx, $query);
+          if($result==TRUE and mysqli_num_rows($result)>0){
+            extract(mysqli_fetch_array($result));
             print "xC(\"$cname\",\"$cleader\",\"$cleader2\",$cpower);";
           }else {
             print "xC(\"\",\"\",\"\",0);";
@@ -67,14 +69,14 @@ if(is_numeric($l)){
       }else if($p !=$password){
         ++$wrong_pw;
         $query="Update Players set wrong_pw=$wrong_pw where Id = $Id";
-        mysql_query($query);
+        mysqli_query($dbx, $query);
         if($wrong_pw>9){
           if($REMOTEADDR !=''){
             global $REMOTEADDR;
             $query="Insert into Ipban values('$REMOTEADDR',now(),'$name')";
-            mysql_query($query);
+            mysqli_query($dbx, $query);
             $query="Update Players set wrong_pw=0 where Id = $Id";
-            mysql_query($query);
+            mysqli_query($dbx, $query);
           }else {
           print "javascript:alert(\"Stop guessing passwords,your IP will be banned.\");\n";
           }
@@ -98,10 +100,10 @@ function valmista_msg($pid){
   global $special1,$special2,$special3,$special4,$REMOTEADDR;
   $REMOTEADDR = $_SERVER['REMOTE_ADDR'];
   $query="Select M.pfrom,M.msgtxt,M.msgtype,date_format(M.msgwhen,'%d %b %T'),I.checked from Messages M, Inventory I where M.pto=$pid and I.Id = $pid";
-  if(($result=mysql_query($query))==TRUE &&($a1=mysql_num_rows($result))>0){
+  if(($result=mysqli_query($dbx, $query))==TRUE &&($a1=mysqli_num_rows($result))>0){
     $a1=min($a1,19);
     for($i=0;$i<$a1;$i++){
-      $row=mysql_fetch_row($result);
+      $row=mysqli_fetch_row($result);
       $msgn[$i]=$row[0];
       $msgtxt[$i]=$row[1];
       $msgtype[$i]=$row[2];
@@ -146,7 +148,7 @@ function valmista_msg($pid){
       }
     }
     $query3="delete from Messages where pto = $pid limit $a1";
-    mysql_query($query3);
+    mysqli_query($dbx, $query3);
   }
   return $a1;
 }
@@ -157,8 +159,8 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
     $mod_s=30;
   }
   $query="Select lastchat,lastrole,lastsale,lastclan from Players where Id = $pid";
-  $result=mysql_query($query);
-  $row=mysql_fetch_row($result);
+  $result=mysqli_query($dbx, $query);
+  $row=mysqli_fetch_row($result);
   $lastchat=$row[0];
   $lastrole=$row[1];
   $lastsale=$row[2];
@@ -167,9 +169,9 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
     $cookieValue = $_COOKIE["pIgnore"];
     
     $query="Select msgname,msgtxt,msgtype,msgnum from chat1 where msgnum>$lastchat and msgtype !=$mod_s and (msgname !='$pname' or (msgtype>20 and msgtype<30)) order by msgnum desc limit $gmax";
-    if(($result=mysql_query($query))==TRUE &&($a1=mysql_num_rows($result))>0){
+    if(($result=mysqli_query($dbx, $query))==TRUE &&($a1=mysqli_num_rows($result))>0){
       for($i=0;$i<$a1;$i++){
-        $row=mysql_fetch_row($result);
+        $row=mysqli_fetch_row($result);
         $chatnames[$chatx]=$row[0];
         $msgtxt[$chatx]=$row[1];
         if($row[2]==8 || $row[2]==19){
@@ -189,9 +191,9 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
     }
     $chatx=0;$a2=0;
     $query="Select msgname,msgtxt,msgtype,msgnum from chat2 where msgnum>$lastrole and msgtype !=$mod_s and (msgname !='$pname' or (msgtype>20 and msgtype<30)) order by msgnum desc limit $gmax";
-    if(($result=mysql_query($query))==TRUE &&($a2=mysql_num_rows($result))>0){
+    if(($result=mysqli_query($dbx, $query))==TRUE &&($a2=mysqli_num_rows($result))>0){
       for($i=0;$i<$a2;$i++){
-        $row=mysql_fetch_row($result);
+        $row=mysqli_fetch_row($result);
         $chatnames[$chatx]=$row[0];
         $msgtxt[$chatx]=$row[1];
         if($row[2]==19){
@@ -211,9 +213,9 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
     }
     $chatx=0;$a2=0;
     $query="Select msgname,msgtxt,msgtype,msgnum from chat3 where msgnum>$lastsale and msgtype !=$mod_s and (msgname !='$pname' or (msgtype>20 and msgtype<30)) order by msgnum desc limit $gmax";
-    if(($result=mysql_query($query))==TRUE &&($a2=mysql_num_rows($result))>0){
+    if(($result=mysqli_query($dbx, $query))==TRUE &&($a2=mysqli_num_rows($result))>0){
       for($i=0;$i<$a2;$i++){
-        $row=mysql_fetch_row($result);
+        $row=mysqli_fetch_row($result);
         $chatnames[$chatx]=$row[0];
         $msgtxt[$chatx]=$row[1];
         if($row[2]==8 || $row[2]==19){
@@ -239,16 +241,16 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
     }else{
       	$query="Select msgname,msgtxt,msgtype,msgnum from chat4 where msgnum>$lastclan and ((msgtype=$clan or msgtype=$race+40 or (msgtype<40 and msgtype!=30) or msgtype=13) and msgtype != 30) and msgname !='$pname' order by msgnum desc limit $gmax";
     }
-    if(($result=mysql_query($query))==TRUE &&($a2=mysql_num_rows($result))>0){
+    if(($result=mysqli_query($dbx, $query))==TRUE &&($a2=mysqli_num_rows($result))>0){
       for($i=0;$i<$a2;$i++){
-        $row=mysql_fetch_row($result);
+        $row=mysqli_fetch_row($result);
         $chatnames[$chatx]=$row[0];
         $msgtxt[$chatx]=$row[1];
         if($row[2]>60){
           $cid=$row[2];
           $query2="Select cname from Clans where cid=$cid";
-          $result2=mysql_query($query2);
-          extract(mysql_fetch_array($result2));
+          $result2=mysqli_query($dbx, $query2);
+          extract(mysqli_fetch_array($result2));
           $chattype[$chatx]=$cname;
         }else{
           $chattype[$chatx]=$row[2];
@@ -268,7 +270,7 @@ function valmista_chat($pname,$cmax,$channels,$clan,$race,$pid){
       }
     }
     $query="Update Players set lastchat=$lastchat,lastrole=$lastrole,lastsale=$lastsale,lastclan=$lastclan where Id = $pid";
-    mysql_query($query);
+    mysqli_query($dbx, $query);
   return 1;
 }
 function cfix($jono){

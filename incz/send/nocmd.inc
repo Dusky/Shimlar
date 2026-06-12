@@ -1,4 +1,6 @@
 <?php
+
+global $dbx;
             switch($channels) {
             case 8: //player cursed
               $cinput=strrev($cinput);
@@ -44,8 +46,8 @@
             if($luku1==4 && $clan>1){
            	  inschat("chat4",$pname,$cinput,$clan);
               $query="Select cname from Clans where cid=$clan";
-              $result=mysql_query($query);
-              extract(mysql_fetch_array($result));
+              $result=mysqli_query($dbx, $query);
+              extract(mysqli_fetch_array($result));
               print "c4(\"$cinput\",\"$pname\",\"$cname\");";
             } else if ($luku1<4){
               inschat("chat$luku1",$pname,$cinput,$channels);

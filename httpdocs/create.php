@@ -32,19 +32,19 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
     	
     	// only allow 3 not activated chars / ip
     	$query = "select * from Players where last_ip = '".$_SERVER['REMOTE_ADDR']."' and pstatus = 0";
-    	$result = mysql_query($query);
-    	if ($result==true and mysql_num_rows($result)>4) {
+    	$result = mysqli_query($dbx, $query);
+    	if ($result==true and mysqli_num_rows($result)>4) {
     		$doContinue = false;
     		ep2(90);
     	}
     	
     	// verify with reserved
     	$query="Select Name as N from Reservation where Name='$newpl'";
-      $result=mysql_query($query);
-      if (($doContinue) && ($result==TRUE and mysql_num_rows($result)==1 )) {
+      $result=mysqli_query($dbx, $query);
+      if (($doContinue) && ($result==TRUE and mysqli_num_rows($result)==1 )) {
       	$query="select * from Reservation where Name = '$newpl' and Login = '$newlogin'";
-      	$result=mysql_query($query);
-      	if ($result==TRUE and mysql_num_rows($result)== 0 ) {
+      	$result=mysqli_query($dbx, $query);
+      	if ($result==TRUE and mysqli_num_rows($result)== 0 ) {
       		// the name is in the reserved table BUT the login is incorrect
       		$doContinue = false;
       		ep2(74);
@@ -52,11 +52,11 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
       }
       
       $query="Select Login as L from Reservation where Login='$newlogin'";
-      $result=mysql_query($query);
-			if (($doContinue) && ($result==TRUE and mysql_num_rows($result)==1 )) {
+      $result=mysqli_query($dbx, $query);
+			if (($doContinue) && ($result==TRUE and mysqli_num_rows($result)==1 )) {
       	$query="select * from Reservation where Name = '$newpl' and Login = '$newlogin'";
-      	$result=mysql_query($query);
-      	if ($result==TRUE and mysql_num_rows($result)== 0 ) {
+      	$result=mysqli_query($dbx, $query);
+      	if ($result==TRUE and mysqli_num_rows($result)== 0 ) {
       		// the name is in the reserved table BUT the login is incorrect
       		$doContinue = false;
       		ep2(75);
@@ -65,28 +65,30 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
     	
     	// verify with existing players
       $query="Select name as N from Players where name='$newpl'";
-      $result=mysql_query($query);
-      if (($doContinue) && ($result==TRUE and mysql_num_rows($result)==1 )) {
+      $result=mysqli_query($dbx, $query);
+      if (($doContinue) && ($result==TRUE and mysqli_num_rows($result)==1 )) {
       	$doContinue = false;
       	ep2(22);
       }
       $query="Select login as L from Players where login='$newlogin'";
-      $result=mysql_query($query);
-      if (($doContinue)&&($result==TRUE and mysql_num_rows($result)==1)) {
+      $result=mysqli_query($dbx, $query);
+      if (($doContinue)&&($result==TRUE and mysqli_num_rows($result)==1)) {
       	$doContinue = false;
       	ep2(73);
       }
       
       // verify with mod names
       $query="select name as N from Players where channels in (10,11,12,20)";
-      $result=mysql_query($query);
-      $num=mysql_num_rows($result);
+      $result=mysqli_query($dbx, $query);
+      $num=mysqli_num_rows($result);
       $i=0;
       while ($i < $num) 
       {
       	if ($doContinue) 
       	{
-      		$modname=mysql_result($result,$i,"N");
+      		mysqli_data_seek($result,$i);
+		$mrow=mysqli_fetch_assoc($result);
+		$modname=$mrow["N"];
       		$pos = strpos($newpl, $modname);
       		if ($pos===false) 
       		{
@@ -106,10 +108,10 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
       
       // verify with players from previous round
       $query="select * from Reservation where Name = '$newpl'";
-      $result=mysql_query($query);
-      if (($doContinue)&&($result==TRUE and mysql_num_rows($result)==1 )) {
+      $result=mysqli_query($dbx, $query);
+      if (($doContinue)&&($result==TRUE and mysqli_num_rows($result)==1 )) {
       	// there is a player with these details in the reservation table, let's now verify the rest
-      	extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+      	extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
       	if (($tgt_Password == $newpw) && ($tgt_Login == $newlogin)) {
       		$doContinue = true;
       		$newChannel=$tgt_Channels;
@@ -142,8 +144,8 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
               $rn2=0;
             }
             $query="Select * From Races where rid=$rn2";
-            $stats=mysql_query($query);
-            extract(mysql_fetch_array($stats));
+            $stats=mysqli_query($dbx, $query);
+            extract(mysqli_fetch_array($stats));
             $rt=$rn2+100*min($gn2,1);
             $zone=$rn2;
             
@@ -151,21 +153,21 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
           
             $query2="Insert into Players Values 
 (null,'$newpl','$newpw','$maili','',1,1,$zone,$newChannel,0,0,0,0,0,0,0,$fire_bonus,$cold_bonus,$air_bonus,$arcane_bonus,$sword_bonus,$axe_bonus,$staff_bonus,$mace_bonus,$armor_bonus,1,now(),'cr',now(),1,1,1,1,'".$_SERVER['REMOTE_ADDR']."',0,0,0,'$newlogin')";
-            mysql_query($query2);
-            $userid = mysql_insert_id();
+            mysqli_query($dbx, $query2);
+            $userid = mysqli_insert_id($dbx);
           
             $query4="Insert into Stats Values 
 ($userid,'$newpl',0,$rt,$r_str,$r_dex,$r_vit,$r_ntl,$r_wis,$r_vit,0,$newGold,0,1,$newLevel,0,0,1,0,0,now(),'',0,now(),now(),0,$stopSales,0,1080,$statusType,0)";
-            mysql_query($query4);
+            mysqli_query($dbx, $query4);
 
             $query3="Insert into Inventory Values 
 ($userid,'$newpl',1000000,5000000,$newOrb,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,$newOrbEquip,0,0)";
-            mysql_query($query3);
+            mysqli_query($dbx, $query3);
           
             // send email in the background
             $query5="select UNIX_TIMESTAMP(ax_time) as ax_time from Players where Id = $userid";
-            $result=mysql_query($query5);
-            extract(mysql_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
+            $result=mysqli_query($dbx, $query5);
+            extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
                   
             $link="http://www.shimlar.org/validate.php?u=$userid&nr=$tgt_ax_time";
             $subject = "Shimlar validation mail for character $newpl";
