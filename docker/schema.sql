@@ -419,6 +419,19 @@ CREATE TABLE IF NOT EXISTS chat4 (
 INSERT INTO Clans (Cid, Cname, Cint, Cint2, Cleader, Cleader2, Cpower, Cbonus, Cduels, Cturn, Cgold)
 VALUES (200, 'System', 0, NULL, 'System', '', 0, 0, 0, 0, 0);
 
+-- Seed races (10 starting races from wiki)
+INSERT INTO Races (Rid, Rname, R_str, R_dex, R_vit, R_ntl, R_wis, R_hp, R_gold, R_level, R_orb, R_orbequip) VALUES
+(1, 'Human', 10, 10, 10, 10, 10, 10, 100, 0, 0, 0),
+(2, 'Dwarf', 11, 11, 13, 8, 7, 13, 100, 0, 0, 0),
+(3, 'Elf', 7, 8, 13, 11, 11, 13, 100, 0, 0, 0),
+(4, 'Dark Elf', 10, 14, 11, 8, 7, 11, 100, 0, 0, 0),
+(5, 'Giant', 16, 10, 14, 5, 5, 14, 100, 0, 0, 0),
+(6, 'Troll', 12, 9, 17, 6, 6, 17, 100, 0, 0, 0),
+(7, 'Goblin', 5, 5, 14, 16, 10, 14, 100, 0, 0, 0),
+(8, 'Angel', 8, 7, 11, 10, 14, 11, 100, 0, 0, 0),
+(9, 'Gargoyle', 6, 6, 17, 12, 9, 17, 100, 0, 0, 0),
+(10, 'Half Elf', 8, 12, 12, 9, 9, 12, 100, 0, 0, 0);
+
 -- Seed db_stats
 INSERT INTO db_stats (Stat_name, Stat_value, Date_modified) VALUES ('Total', 0, NOW());
 INSERT INTO db_stats (Stat_name, Stat_value, Date_modified) VALUES ('Inactive', 0, NOW());
