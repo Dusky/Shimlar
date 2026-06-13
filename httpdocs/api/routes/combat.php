@@ -228,66 +228,83 @@ function api_parse_battle_output($output) {
  */
 function api_decode_battle_string($str) {
     $events = [];
-    $tokens = explode(',', $str);
+    $len = strlen($str);
     $i = 0;
-    while ($i < count($tokens)) {
-        $token = $tokens[$i];
+    
+    while ($i < $len) {
+        // Skip stray dots/commas
+        if ($str[$i] == '.' || $str[$i] == ',') { $i++; continue; }
         
-        if ($token === 'u' || $token === 'e') {
-            $who = $token === 'u' ? 'player' : 'enemy';
+        // Read the next token (letters + optional digits)
+        $tok = '';
+        while ($i < $len && $str[$i] != ',' && $str[$i] != '.') {
+            $tok .= $str[$i];
             $i++;
-            if ($i >= count($tokens)) break;
-            $next = $tokens[$i];
-            
-            if (preg_match('/^f(\d+)$/', $next, $m)) {
-                $i++;
-                $damage = isset($tokens[$i]) ? (int)$tokens[$i] : 0;
-                $events[] = ['who' => $who, 'type' => 'weapon_hit', 'element' => (int)$m[1], 'damage' => $damage, 'critical' => false];
-            } else if (preg_match('/^fc(\d+)$/', $next, $m)) {
-                $i++;
-                $damage = isset($tokens[$i]) ? (int)$tokens[$i] : 0;
-                $events[] = ['who' => $who, 'type' => 'weapon_hit', 'element' => (int)$m[1], 'damage' => $damage, 'critical' => true];
-            } else if (preg_match('/^s(\d+)$/', $next, $m)) {
-                $i++;
-                $damage = isset($tokens[$i]) ? (int)$tokens[$i] : 0;
-                $events[] = ['who' => $who, 'type' => 'spell_hit', 'element' => (int)$m[1], 'damage' => $damage, 'critical' => false];
-            } else if (preg_match('/^sc(\d+)$/', $next, $m)) {
-                $i++;
-                $damage = isset($tokens[$i]) ? (int)$tokens[$i] : 0;
-                $events[] = ['who' => $who, 'type' => 'spell_hit', 'element' => (int)$m[1], 'damage' => $damage, 'critical' => true];
-            } else if ($next === 'm') {
-                $events[] = ['who' => $who, 'type' => 'miss'];
-            } else if ($next === 't') {
-                $events[] = ['who' => $who, 'type' => 'spell_miss'];
-            } else if ($next === 'h') {
-                $i++;
-                $damage = isset($tokens[$i]) ? (int)$tokens[$i] : 0;
-                $events[] = ['who' => $who, 'type' => 'heal', 'damage' => $damage];
-            } else if ($next === 'y') {
-                $events[] = ['who' => $who, 'type' => 'heal_no_effect'];
-            }
-        } else if ($token === 'r') {
-            $events[] = ['who' => 'player', 'type' => 'died'];
-        } else if ($token === 'vd') {
-            $events[] = ['type' => 'error_ghost'];
-        } else if ($token === 'vx') {
-            $events[] = ['type' => 'error_no_enemy'];
-        } else if ($token === 'vn') {
-            $events[] = ['type' => 'error_zone'];
-        } else if ($token === 'vm') {
-            $events[] = ['type' => 'error_pvp_zone'];
-        } else if (preg_match('/^b,(\d+)$/', $token, $m)) {
-            $events[] = ['type' => 'bounty_health', 'health' => (int)$m[1]];
-        } else if (preg_match('/^vp(\d+)$/', $token, $m)) {
-            $events[] = ['type' => 'error_pk_cooldown', 'seconds' => (int)$m[1]];
-        } else if ($token === 'vt') {
-            $events[] = ['type' => 'error_target_moved'];
-        } else if ($token === 'vz') {
-            $events[] = ['type' => 'error_target_dead'];
+        }
+        // Skip separator
+        if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+        
+        if (strlen($tok) == 0) continue;
+        
+        // Parse token
+        $who = '';
+        if ($tok[0] == 'u') $who = 'player';
+        elseif ($tok[0] == 'e') $who = 'enemy';
+        else {
+            // Standalone tokens (errors etc)
+            if ($tok === 'r') { $events[] = ['who' => 'player', 'type' => 'died']; continue; }
+            if ($tok === 'vd') { $events[] = ['type' => 'error_ghost']; continue; }
+            if ($tok === 'vx') { $events[] = ['type' => 'error_no_enemy']; continue; }
+            if ($tok === 'vn') { $events[] = ['type' => 'error_zone']; continue; }
+            if ($tok === 'vm') { $events[] = ['type' => 'error_pvp_zone']; continue; }
+            if ($tok === 'vt') { $events[] = ['type' => 'error_target_moved']; continue; }
+            if ($tok === 'vz') { $events[] = ['type' => 'error_target_dead']; continue; }
+            if (preg_match('/^vp(\d+)$/', $tok, $m)) { $events[] = ['type' => 'error_pk_cooldown', 'seconds' => (int)$m[1]]; continue; }
+            if ($tok === 'a') { $events[] = ['type' => 'ambush']; continue; }
+            if ($tok === 'b') { $events[] = ['type' => 'bounty']; continue; }
+            continue;
         }
         
-        $i++;
+        $action = substr($tok, 1);
+        
+        if ($action === 'm') {
+            $events[] = ['who' => $who, 'type' => 'miss'];
+        } elseif ($action === 't') {
+            $events[] = ['who' => $who, 'type' => 'spell_miss'];
+        } elseif ($action === 'y') {
+            $events[] = ['who' => $who, 'type' => 'heal_no_effect'];
+        } elseif ($action === 'r') {
+            $events[] = ['who' => $who, 'type' => 'died'];
+        } elseif (preg_match('/^f(\d+)$/', $action, $m)) {
+            // weapon hit: next token is damage
+            $dmg = '';
+            while ($i < $len && $str[$i] != ',' && $str[$i] != '.') { $dmg .= $str[$i]; $i++; }
+            if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+            $events[] = ['who' => $who, 'type' => 'weapon_hit', 'element' => (int)$m[1], 'damage' => (int)$dmg, 'critical' => false];
+        } elseif (preg_match('/^fc(\d+)$/', $action, $m)) {
+            $dmg = '';
+            while ($i < $len && $str[$i] != ',' && $str[$i] != '.') { $dmg .= $str[$i]; $i++; }
+            if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+            $events[] = ['who' => $who, 'type' => 'weapon_hit', 'element' => (int)$m[1], 'damage' => (int)$dmg, 'critical' => true];
+        } elseif (preg_match('/^s(\d+)$/', $action, $m)) {
+            $dmg = '';
+            while ($i < $len && $str[$i] != ',' && $str[$i] != '.') { $dmg .= $str[$i]; $i++; }
+            if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+            $events[] = ['who' => $who, 'type' => 'spell_hit', 'element' => (int)$m[1], 'damage' => (int)$dmg, 'critical' => false];
+        } elseif (preg_match('/^sc(\d+)$/', $action, $m)) {
+            $dmg = '';
+            while ($i < $len && $str[$i] != ',' && $str[$i] != '.') { $dmg .= $str[$i]; $i++; }
+            if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+            $events[] = ['who' => $who, 'type' => 'spell_hit', 'element' => (int)$m[1], 'damage' => (int)$dmg, 'critical' => true];
+        } elseif ($action === 'h') {
+            $dmg = '';
+            while ($i < $len && $str[$i] != ',' && $str[$i] != '.') { $dmg .= $str[$i]; $i++; }
+            if ($i < $len && ($str[$i] == ',' || $str[$i] == '.')) $i++;
+            $events[] = ['who' => $who, 'type' => 'heal', 'damage' => (int)$dmg];
+        } elseif (preg_match('/^b(\d+)$/', $action, $m)) {
+            $events[] = ['type' => 'bounty_health', 'health' => (int)$m[1]];
+        }
     }
-
+    
     return $events;
 }
