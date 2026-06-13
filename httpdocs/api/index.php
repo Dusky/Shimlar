@@ -21,6 +21,11 @@ $section = $routeParts[0] ?? '';
 
 $routeFile = __DIR__ . '/routes/' . $section . '.php';
 
+// Combat routes share the 'game' prefix but use a separate file
+if ($section === 'game' && in_array($routeParts[1] ?? '', ['fight', 'cast', 'newfight', 'newduel'])) {
+    $routeFile = __DIR__ . '/routes/combat.php';
+}
+
 if (file_exists($routeFile)) {
     require_once $routeFile;
 } else {
@@ -42,6 +47,10 @@ if (file_exists($routeFile)) {
             'POST /api/game/fight',
             'POST /api/game/heal',
             'POST /api/game/bank',
+            'POST /api/game/fight',
+            'POST /api/game/cast',
+            'POST /api/game/newfight',
+            'POST /api/game/newduel',
             'GET  /api/chat/messages',
             'POST /api/chat/send',
             'POST /api/chat/channel',

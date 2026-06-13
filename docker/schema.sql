@@ -355,12 +355,44 @@ CREATE TABLE IF NOT EXISTS Fame (
   Fame INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Hunts (bounty/boss system)
+CREATE TABLE IF NOT EXISTS Hunts (
+  Bzone INT PRIMARY KEY,
+  Health INT DEFAULT 0,
+  Eq BIGINT DEFAULT 0,
+  Bname VARCHAR(100) DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Zones
 CREATE TABLE IF NOT EXISTS Zones (
-  Zid INT PRIMARY KEY,
+  znum INT PRIMARY KEY,
   Zname VARCHAR(100) DEFAULT '',
   Zdesc TEXT DEFAULT NULL,
-  Ztype INT DEFAULT 0
+  Ztype INT DEFAULT 0,
+  zone_x INT DEFAULT 0,
+  zone_y INT DEFAULT 0,
+  zone_p INT DEFAULT 0,
+  zlevel INT DEFAULT 0,
+  zkoko INT DEFAULT 0,
+  zshop INT DEFAULT 0,
+  zshrine INT DEFAULT 0,
+  zmage INT DEFAULT 0,
+  zbank INT DEFAULT 0,
+  zexit INT DEFAULT 0,
+  zmonsters INT DEFAULT 5,
+  zhunt INT DEFAULT 0,
+  zbase_stats INT DEFAULT 0,
+  zbase_eq INT DEFAULT 0,
+  mlist TEXT DEFAULT NULL,
+  minqlvl INT DEFAULT 0,
+  qincrement INT DEFAULT 0,
+  qrange INT DEFAULT 0,
+  expFactor FLOAT DEFAULT 1.0,
+  goldFactor FLOAT DEFAULT 1.0,
+  max_wep INT DEFAULT 0,
+  max_eq INT DEFAULT 0,
+  max_spells INT DEFAULT 0,
+  isqzone INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Races
@@ -376,7 +408,16 @@ CREATE TABLE IF NOT EXISTS Races (
   R_gold INT DEFAULT 0,
   R_level INT DEFAULT 0,
   R_orb BIGINT DEFAULT 0,
-  R_orbequip INT DEFAULT 0
+  R_orbequip INT DEFAULT 0,
+  Fire_max INT DEFAULT 100,
+  Cold_max INT DEFAULT 100,
+  Air_max INT DEFAULT 100,
+  Arcane_max INT DEFAULT 100,
+  Sword_max INT DEFAULT 100,
+  Axe_max INT DEFAULT 100,
+  Staff_max INT DEFAULT 100,
+  Mace_max INT DEFAULT 100,
+  Armor_max INT DEFAULT 100
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Database stats

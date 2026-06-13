@@ -5,6 +5,7 @@ global $dbx;
 $btlstr="";$damage=0;
 
 function batproc($l,$p,$a,$k,$m){
+global $dbx;
 
 global $REMOTEADDR,$REQUESTURI,$btlstr,$damage,$lastmon,$lvl,$spec_ma;
 $REMOTEADDR = $_SERVER['REMOTE_ADDR'];

@@ -155,7 +155,7 @@ function api_process_action($pid, $action, $c1, $c2, $c3) {
     switch ($action) {
         case 'o': // Overview
             $zone = (int)($p['Loc_zone'] ?? 1);
-            $zQ = mysqli_query($dbx, "SELECT * FROM Zones WHERE Zid=$zone");
+            $zQ = mysqli_query($dbx, "SELECT * FROM Zones WHERE znum=$zone");
             $result['zone'] = $zQ ? mysqli_fetch_assoc($zQ) : null;
             $result['player']['str'] = (int)($s['Str'] ?? 0);
             $result['player']['dex'] = (int)($s['Dex'] ?? 0);
