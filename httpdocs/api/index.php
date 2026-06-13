@@ -26,6 +26,12 @@ if ($section === 'game' && in_array($routeParts[1] ?? '', ['fight', 'cast', 'new
     $routeFile = __DIR__ . '/routes/combat.php';
 }
 
+// Shop and item routes are under /api/shop/* and /api/item/*
+// Both load from shop.php which handles the 'item' prefix too
+if ($section === 'item') {
+    $routeFile = __DIR__ . '/routes/shop.php';
+}
+
 if (file_exists($routeFile)) {
     require_once $routeFile;
 } else {
@@ -58,6 +64,12 @@ if (file_exists($routeFile)) {
             'POST /api/clan/create',
             'POST /api/clan/leave',
             'POST /api/clan/donate',
+            'POST /api/shop/browse',
+            'POST /api/shop/buy',
+            'POST /api/shop/sell',
+            'POST /api/item/equip',
+            'POST /api/item/unequip',
+            'POST /api/item/combine',
         ]
     ]);
 }
