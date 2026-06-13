@@ -64,7 +64,7 @@ global $dbx;
           $query="update Stats set PKill=(PKill+1),align=$align,fame=fame+$fame where Id = $Id";
           mysqli_query($dbx, $query);          
         } else {
-          sqlS(align,$align,$Id);
+          sqlS('align',$align,$Id);
         }
       }
       $btlstr.="s,";

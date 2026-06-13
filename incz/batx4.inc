@@ -4,7 +4,7 @@ global $dbx;
 
 $btlstr="";$damage=0;
 
-function batproc($l,$p,$a,$k,$m){
+function batproc($l,$p,$a,$k,$m,$api_authed=false){
 global $dbx;
 
 global $REMOTEADDR,$REQUESTURI,$btlstr,$damage,$lastmon,$lvl,$spec_ma;
@@ -14,9 +14,9 @@ if($REMOTEADDR==""){
  $REMOTEADDR=$l;
 }
 
-if(is_numeric($l) && $REQUESTURI=="/battle4.php"){
+if($api_authed || (is_numeric($l) && $REQUESTURI=="/battle4.php")){
 
-	if(tarkista($p) && tarkista($a) && tarkista($m) && $k != -1){
+	if($api_authed || (tarkista($p) && tarkista($a) && tarkista($m) && $k != -1)){
 		$fmt=1;$kd_tax=0;$action=$a;
 		$query="Lock Tables Players WRITE,Stats WRITE,Inventory WRITE,Zones WRITE,Messages WRITE,Quests WRITE,Races WRITE,Hunts WRITE,chat1 WRITE,chat4 WRITE,Clans WRITE,Kingdoms WRITE,Modactions WRITE,PKTag READ, PKLog WRITE";
 		mysqli_query($dbx, $query);

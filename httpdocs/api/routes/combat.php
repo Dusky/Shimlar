@@ -101,7 +101,7 @@ function api_do_combat($pid, $action, $c1, $c2) {
     $GLOBALS['dbx'] = $dbx;
     
     // Call the battle processor directly
-    batproc($l, $p, $a, $k, $m);
+    batproc($l, $p, $a, $k, $m, true);
 
     $_SERVER['REQUEST_URI'] = $origRequestUri;
     error_reporting($prevErrorLevel);

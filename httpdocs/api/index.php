@@ -32,6 +32,11 @@ if ($section === 'item') {
     $routeFile = __DIR__ . '/routes/shop.php';
 }
 
+// Training routes share the 'game' prefix
+if ($section === 'game' && in_array($routeParts[1] ?? '', ['levelup', 'train', 'progress'])) {
+    $routeFile = __DIR__ . '/routes/training.php';
+}
+
 if (file_exists($routeFile)) {
     require_once $routeFile;
 } else {
@@ -70,6 +75,13 @@ if (file_exists($routeFile)) {
             'POST /api/item/equip',
             'POST /api/item/unequip',
             'POST /api/item/combine',
+            'POST /api/game/levelup',
+            'POST /api/game/train',
+            'GET  /api/game/progress',
+            'GET  /api/quest/list',
+            'POST /api/quest/accept',
+            'POST /api/quest/complete',
+            'GET  /api/quest/current',
         ]
     ]);
 }

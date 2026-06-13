@@ -357,7 +357,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     	{
       	if($howned==1 && $gold>=20000000){
         	$gold-=20000000;
-        	sqlS(gold,$gold,$pid);
+        	sqlS('gold',$gold,$pid);
         	$query="Insert into Housing values($pid,null,'$pname','',$loc_x*10+$loc_y,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'','')";
         	mysqli_query($dbx, $query);
         	$hslist=array(0,0,0,0,0,0,0,0,0,0);$hi_max=10;
@@ -458,7 +458,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   	    						mysqli_query($dbx, $query);
   	    						if ($tstatus==1) {
         							$gold-=20000000;
-        							sqlS(gold,$gold,$pid);
+        							sqlS('gold',$gold,$pid);
         						}
         					}
         				}
@@ -481,7 +481,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($gold>=20000000){
             $h_status+=1;$gold-=20000000;
             sqlH(h_status,$h_status,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
           }else {
             ep2(16);
           }
@@ -498,7 +498,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($gold>=$cost){
             $h_status+=2-($h_status%2);$gold-=$cost;
             sqlH(h_status,$h_status,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
           }else {
             ep2(16);
           }
@@ -510,7 +510,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($gold>=12000000){
             $h_status+=4;$gold-=12000000;
             sqlH(h_status,$h_status,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
           }else {
             ep2(16);
           }
@@ -522,7 +522,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($gold>=12000000){
             $h_status+=8;$gold-=12000000;
             sqlH(h_status,$h_status,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
           }else {
             ep2(16);
           }
@@ -534,7 +534,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($gold>=4000000){
             $h_status+=16;$gold-=4000000;
             sqlH(h_status,$h_status,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
           }else {
             ep2(16);
           }
@@ -608,8 +608,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         			}else {
           			$banked=$banked-$c1;
           			$tgt_banked=$tgt_banked+$c1;
-          			sqlS(banked,$banked,$pid);
-          			sqlS(banked,$tgt_banked,$tgt_Id);
+          			sqlS('banked',$banked,$pid);
+          			sqlS('banked',$tgt_banked,$tgt_Id);
           			$query="Insert into Messages values($tgt_Id,'$pname',$c1,21,now())";
           			mysqli_query($dbx, $query);
           			$query="update Stats set e_health=0 where e_health = -1 and Id = $pid";
@@ -655,7 +655,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($tgt_loc_zone==29){
             $tgt_loc_x="?";$tgt_loc_y="?";
           }
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
         }else {
           ep2(16);$spec_find=0;
         }
@@ -674,7 +674,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     $cost=$lvl*100;
     if($cost<=$gold && $stuff_here==5){
       $gold=$gold-$cost;
-      sqlS(gold,$gold,$pid);
+      sqlS('gold',$gold,$pid);
       myPrint("mX(5);");
       $statmode=2;
       myPrint("x9($sword_m,$axe_m,$staff_m,$mace_m,$fire_m,$cold_m,$air_m,$arcane_m,$armor_m,$double_m);");
@@ -778,7 +778,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $iy=($c1*100+$iclass)*10000;
         $invlist[$x-1]=$iy;
         $gold=$gold-$price;
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         $sqlix="i$x";sqlI($sqlix,$iy,$pid);
         $statmode=1;
         debugText("Shop-buy from $pname item :$iy Price :$price :c1=$c1:c2=$c2");
@@ -791,7 +791,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $iy=($c1*100+$iclass)*10000;
         $invlist[$x-1]=$iy;
         $gold=$gold-$price;
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         $sqlix="i$x";sqlI($sqlix,$iy,$pid);
         $statmode=1;
         debugText("Shop-buy from $pname item :$iy Price :$price :c1=$c1:c2=$c2");
@@ -804,7 +804,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $iy=($c1*100+$iclass)*10000;
         $invlist[$x-1]=$iy;
         $gold=$gold-$price;
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         $sqlix="i$x";sqlI($sqlix,$iy,$pid);
         $statmode=1;
         debugText("Shop-buy from $pname item :$iy Price :$price :c1=$c1:c2=$c2");
@@ -823,7 +823,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $iy=($c1*100+$c2)*10000;
         $invlist[$x-1]=$iy;
         $gold=$gold-$price;
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         $sqlix="i$x";sqlI($sqlix,$iy,$pid);
         $statmode=1;
         debugText("Shop-buy from $pname item :$iy Price :$price :c1=$c1:c2=$c2");
@@ -894,7 +894,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         if($rhand !=$x && $lhand !=$x && $spellone !=$x && $spelltwo !=$x && $armor !=$x && $accx !=$x){
           $invlist[$c1]=0;
           $gold=$gold+$price;
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           $sqlix="i$x";sqlI($sqlix,0,$pid);
           debugText("Shop-sale from ".$pname." item : ".$debugItem." Price : ".$price);
           myPrint("mX(9);");
@@ -926,7 +926,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         }
       	if(($banked>=$tgt_tprice) && ($x>0) && ($itsforme)){
           $banked=$banked-$tgt_tprice; // bank player
-          sqlS(banked,$banked,$pid);                                                                        
+          sqlS('banked',$banked,$pid);                                                                        
           $invlist[$x-1]=$tgt_titem;   // give item                                                                        
           $sqlix="i$x";sqlI($sqlix,$tgt_titem,$pid);                                                           
           $query="Select pname, tradex from Inventory where Id = $tgt_tfrom";                                         
@@ -1231,7 +1231,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   }else if($action=="he"){             //action house healing
     if($stuff_here==8 && $howned==2 && ($hint==$pid||$hint2==$pid)){
       $health=$vit;
-      sqlS(health,$health,$pid);
+      sqlS('health',$health,$pid);
       myPrint("mX(24);");
     }else {
       ep2(36);
@@ -1334,7 +1334,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       	} else {
         	$gold-=100000;
       	}
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         $sqlix="i$x";sqlI($sqlix,$invlist[$x-1],$pid);
         $sqliy="i$y";sqlI($sqliy,$invlist[$y-1],$pid);
         myPrint("mX(26);");
@@ -1356,12 +1356,12 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==10 && $gold>=$price && freelvl==0){
       if(($loc_zone==31) && ($align >= 0)){
         $align = round($align - min(abs($align)*10/100,50));
-        sqlS(align,$align,$pid);
+        sqlS('align',$align,$pid);
      // }else if($loc_zone==33){
      //   $align= round($align-($align/abs($align))*min((abs($align)*10/100),50));
       }else if (($loc_zone==24)&&($align <= 0)) {
         $align = round($align + min(abs($align)*10/100,50));
-        sqlS(align,$align,$pid);
+        sqlS('align',$align,$pid);
       }
       $prayeff=rand(1,15);
       if($cbonus==7){
@@ -1437,7 +1437,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         if ($doLvl && (rand(0,10)==5))
         { 
             myPrint("mX(29);");
-            sqlS(freelvl,1,$pid);
+            sqlS('freelvl',1,$pid);
         }
       }else if($prayeff==9){
         myPrint("mX(28);");
@@ -1453,7 +1453,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         myPrint("mX(27);");
       }
       $gold-=$price;
-      sqlS(gold,$gold,$pid);
+      sqlS('gold',$gold,$pid);
     }else if($gold<$price){
       ep2(16);
     }
@@ -1471,7 +1471,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           $invlist[$c1]+=10000000;
           $x=$c1+1;$gold-=$price;
           $sqlix="i$x";sqlI($sqlix,$invlist[$c1],$pid);
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           myPrint("mX(30);");
         }else{
           ep2(16);
@@ -1585,9 +1585,9 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           if($tgt_clan==1 && $tgt_lvl>99){
           	if ($tgt_tstatus==$tstatus) {
             	$gold-=1000000;
-            	sqlS(gold,$gold,$pid);
+            	sqlS('gold',$gold,$pid);
             	$cpower+=clanp($tgt_lvl);
-            	sqlS(clan,$clan,$tgt_Id);
+            	sqlS('clan',$clan,$tgt_Id);
             	sqlC(cpower,$cpower,$clan);
             	$query="Insert into Messages values($tgt_Id,'$pname','accepted you into clan $cname',26,now())";
             	mysqli_query($dbx, $query);
@@ -1624,7 +1624,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"tgt");
           if($tgt_clan==$clan && $tgt_Id !=$pid && $tgt_Id !=$cint && $tgt_Id != $cint2){
             $cpower-=clanp($tgt_lvl);
-            sqlS(clan,0,$tgt_Id);
+            sqlS('clan',0,$tgt_Id);
             sqlC(cpower,$cpower,$clan);
             if($tgt_Id==$cint2){
               $query="update Clans set cint2 = null, cleader2 = '' where cid = $clan";
@@ -1655,7 +1655,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
       if($cpower>0 && ($cint==$pid || $cint2==$pid) && $gold>=1000000){
         if((15*$c1)<=$cpower){
           $gold-=1000000;$cbonus=$c1;
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           sqlC(cbonus,$cbonus,$clan);
           myPrint("mX(36);");
         }else{
@@ -1677,7 +1677,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             	$query="update Clans set cint=$cint2, cleader = '$cleader2', cint2 = null, cleader2 = '' where cid = $clan";
             	mysqli_query($dbx, $query);
             	$cpower-=clanp($lvl);$cleader=$cleader2;$cleader2="";
-            	sqlS(clan,0,$pid);
+            	sqlS('clan',0,$pid);
             	sqlC(cpower,$cpower,$clan);
             	$query="Insert into Messages values($cint2,'$pname','has left the clan $cname, making you the leader',26,now())";
             	mysqli_query($dbx, $query);
@@ -1704,7 +1704,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             	$query="update Clans set cint2 = null, cleader2 = '' where cid = $clan";
             	mysqli_query($dbx, $query);
             	$cpower-=clanp($lvl);$cleader2="";
-            	sqlS(clan,"",$pid);
+            	sqlS('clan',"",$pid);
             	sqlC(cpower,$cpower,$clan);
             	myPrint("mX(38);");
             	$clan=0;
@@ -1713,7 +1713,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             }
           }else{
             $cpower-=clanp($lvl);
-            sqlS(clan,0,$pid);
+            sqlS('clan',0,$pid);
             sqlC(cpower,$cpower,$clan);
             myPrint("mX(38);");
             $clan=0;
@@ -1737,8 +1737,8 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
     if($stuff_here==12){
       if($cpower==0 && $gold>=1000000 && $lvl>99){
         $gold-=1000000;$clan=1;
-        sqlS(gold,$gold,$pid);
-        sqlS(clan,1,$pid);
+        sqlS('gold',$gold,$pid);
+        sqlS('clan',1,$pid);
         myPrint("mX(37);");
       }else if($gold<1000000){
         ep2(16);
@@ -1755,7 +1755,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $result=mysqli_query($dbx, $query);
         if($result==TRUE and mysqli_num_rows($result)==0){
           $gold-=1000000;
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           $query="Insert into Kingdoms values($loc_x*10+$loc_y,$clan,'','',0,0,0,0,1,0,10000000)";
           mysqli_query($dbx, $query);
           $kdclan=$cname;$kd_def=0;$kd_mine=0;$kd_tax=0;$kd_gold=0;$kd_desc="";$kd_flag="";
@@ -1794,7 +1794,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
         $kd_gold=$kd_gold-$c1;
         $gold=$gold+$c1;
         sqlK(kd_gold,$kd_gold,$loc_x*10+$loc_y);
-        sqlS(gold,$gold,$pid);
+        sqlS('gold',$gold,$pid);
         myPrint("mX(2);");
       }else if($c1>$kd_gold){
         ep2(56);
@@ -1836,7 +1836,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
             $gold-=$price;
             sqlK(kd_def,$kd_def,$loc_x*10+$loc_y);
             sqlK(kd_health,$kd_health,$loc_x*10+$loc_y);
-            sqlS(gold,$gold,$pid);
+            sqlS('gold',$gold,$pid);
             myPrint("mX(40);");
           }else{
             ep2(50);
@@ -1845,13 +1845,13 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
           $kd_mine=$c2;
           $gold-=$price;
           sqlK(kd_mine,$kd_mine,$loc_x*10+$loc_y);
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           myPrint("mX(40);");
       }else if($c1==3){
           $kd_misc=$c2;
           $gold-=$price;
           sqlK(kd_misc,$kd_misc,$loc_x*10+$loc_y);
-          sqlS(gold,$gold,$pid);
+          sqlS('gold',$gold,$pid);
           myPrint("mX(40);");
         }
       }else{
@@ -1878,7 +1878,7 @@ $statmode=0;$lastfight=0;$x=0;$y=0;$tspecial=0;$blessx=0;$eq_req=0; //$bdelay=0;
   mysqli_query($dbx, $query);
   if($action=="o"||$action=="nc"){
     myPrint("x0(\"$pname\",\"$password\",\"$rname\",\"$surname\",\"$pid\",$turns,$tstatus);");
-    sqlS(fmt,1,$pid);
+    sqlS('fmt',1,$pid);
   }
   if($action=="o"||$action=="r"||$action=="q2"||$action=="he"||$action=="nc"||$action=="pr"){
     myPrint("x1($exp,$gold,$health,$align);");

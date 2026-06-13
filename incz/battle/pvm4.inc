@@ -4,7 +4,7 @@ global $dbx;
 	if($e_health<=0){
   	if(rand(1,150)==11){
   		$fmt=rand(1,22);
-  		sqlS(fmt,$fmt,$Id);
+  		sqlS('fmt',$fmt,$Id);
   		print "top.fmt=$fmt;";
     }
     if($max_gem>0 && $lastmon !=999){
@@ -84,9 +84,9 @@ global $dbx;
   		print "mX(19);";
     }
       if($tef>0){
-  --$tfc;sqlS(tfc,$tfc,$Id);
+  --$tfc;sqlS('tfc',$tfc,$Id);
   if($tfc==0){
-    $tef=0;sqlS(tef,0,$Id);
+    $tef=0;sqlS('tef',0,$Id);
   }
       }
     if($lastmon !=999){
@@ -94,16 +94,16 @@ global $dbx;
       if($loc_zone==15 || $loc_zone==19 || $loc_zone==21 || $loc_zone==46){
       	if(rand(1,333)==111 && $align<10000){
       		++$align;
-      		sqlS(align,$align,$Id);
+      		sqlS('align',$align,$Id);
       	}
       }else if($loc_zone==17 || $loc_zone==22 || $loc_zone==23 || $loc_zone==47){
       	if(rand(1,333)==222 && $align>-10000){
       		--$align;
-      		sqlS(align,$align,$Id);
+      		sqlS('align',$align,$Id);
       	}
       }
       // } else if ($spec_align!=0) {
-      	sqlS(align,$align,$Id);
+      	sqlS('align',$align,$Id);
       // }
       $exp=$exp+round($zbase_exp*pow(1.5,(int)$lastmonx)*(1+$exp_bonus))*$spec_exp;
       if($tstatus==1) {
