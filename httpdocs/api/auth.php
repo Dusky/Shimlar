@@ -1,43 +1,93 @@
 <?php
-// Session + password helpers shared by the API.
-// Players.password is plaintext on legacy accounts; new accounts created via
-// /api/auth/create are hashed with password_hash(). Both are accepted here.
+/**
+ * Shimlar API — Session & Auth Helpers
+ */
 
-require_once __DIR__ . '/../../incz/constvars.inc';
-
-function shim_password_matches($inputPassword, $storedPassword) {
-    if ($storedPassword !== '' && (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0)) {
-        return password_verify($inputPassword, $storedPassword);
+function api_session_start() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
-    return $inputPassword === $storedPassword;
 }
 
-// Looks up a player by login name and verifies the password.
-// Returns the Players row (assoc array) on success, or null on failure.
-function shim_authenticate($login, $password) {
+/**
+ * Authenticate player by login + password.
+ * Returns player info array or false.
+ */
+function api_authenticate($login, $password) {
     global $dbx;
-    $login = mysqli_real_escape_string($dbx, $login);
-    $query = "select Id, name, password, banned, pstatus from Players where login = '$login'";
+    $login = trim($login);
+    if (empty($login) || empty($password)) return false;
+
+    // Try login field first
+    $pid = getIdByLogin($login);
+    if ($pid == -1) {
+        // Try as numeric ID
+        if (is_numeric($login)) {
+            $pid = (int)$login;
+        } else {
+            return false;
+        }
+    }
+
+    $query = "SELECT p.Id, p.Name, p.Password, p.Channels, p.Banned, p.Pstatus, p.Loc_x, p.Loc_y, p.Loc_zone 
+              FROM Players p WHERE p.Id = $pid";
+    $result = mysqli_query($dbx, $query);
+    if (!$result || mysqli_num_rows($result) !== 1) return false;
+
+    $player = mysqli_fetch_assoc($result);
+
+    // Password check (support both plaintext legacy and hashed)
+    if (!password_verify($password, $player['Password']) && $player['Password'] !== $password) {
+        return false;
+    }
+
+    // Check bans
+    if ($player['Banned'] == 100) return ['error' => 'banned'];
+    if ($player['Pstatus'] == 0) return ['error' => 'unvalidated'];
+
+    return $player;
+}
+
+/**
+ * Set session for authenticated player
+ */
+function api_login_session($player) {
+    api_session_start();
+    $_SESSION['player_id'] = (int)$player['Id'];
+    $_SESSION['player_name'] = $player['Name'];
+    $_SESSION['logged_in'] = true;
+}
+
+/**
+ * Check if current session is authenticated.
+ * Returns player array or sends 401 and exits.
+ */
+function api_require_auth() {
+    global $dbx;
+    api_session_start();
+
+    if (empty($_SESSION['logged_in']) || empty($_SESSION['player_id'])) {
+        api_json(['error' => 'Not authenticated'], 401);
+        exit;
+    }
+
+    $pid = (int)$_SESSION['player_id'];
+    $query = "SELECT p.*, s.* FROM Players p 
+              LEFT JOIN Stats s ON p.Id = s.Id 
+              WHERE p.Id = $pid";
     $result = mysqli_query($dbx, $query);
     if (!$result || mysqli_num_rows($result) !== 1) {
-        return null;
+        api_json(['error' => 'Player not found'], 404);
+        exit;
     }
-    $row = mysqli_fetch_assoc($result);
-    if ((int)$row['banned'] === 100 || (int)$row['pstatus'] === 0) {
-        return null;
-    }
-    if (!shim_password_matches($password, $row['password'])) {
-        return null;
-    }
-    return $row;
+
+    return mysqli_fetch_assoc($result);
 }
 
-// Starts an authenticated session for the given player row.
-function shim_start_session($playerRow) {
-    session_regenerate_id(true);
-    $_SESSION['player_id'] = (int)$playerRow['Id'];
-    $_SESSION['player_name'] = $playerRow['name'];
-    // Stored verbatim so legacy game logic (which still does `$p == $password`
-    // against the DB column) can be satisfied without re-prompting for a password.
-    $_SESSION['db_password'] = $playerRow['password'];
+/**
+ * Get player ID from session without full load
+ */
+function api_player_id() {
+    api_session_start();
+    return !empty($_SESSION['player_id']) ? (int)$_SESSION['player_id'] : 0;
 }

@@ -1,29 +1,54 @@
 <?php
-// Router for /api/* — dispatches to routes/<resource>.php based on the
-// path after /api/. Works whether reached via .htaccess rewrite (PATH_INFO
-// preserved) or by hitting index.php directly, e.g.
-//   /api/auth/login            (via .htaccess rewrite)
-//   /api/index.php/auth/login  (PATH_INFO, no rewrite needed)
-//   /api/index.php?r=auth/login
+/**
+ * Shimlar API Router
+ * All /api/* requests land here via .htaccess rewrite
+ */
 
-require_once __DIR__ . '/middleware.php';
+// Extract the route from the rewritten URL
+$requestUri = $_SERVER['REQUEST_URI'];
+$path = parse_url($requestUri, PHP_URL_PATH);
 
-$path = $_SERVER['PATH_INFO'] ?? '';
-if ($path === '' && isset($_GET['r'])) {
-    $path = $_GET['r'];
+// Remove /api/ prefix
+$route = preg_replace('#^/api/?#', '', $path);
+$route = trim($route, '/');
+
+// Store route for route files to access
+$_GET['route'] = $route;
+
+// Determine which route file to load
+$routeParts = explode('/', $route);
+$section = $routeParts[0] ?? '';
+
+$routeFile = __DIR__ . '/routes/' . $section . '.php';
+
+if (file_exists($routeFile)) {
+    require_once $routeFile;
+} else {
+    header('Content-Type: application/json');
+    http_response_code(404);
+    echo json_encode([
+        'success' => false,
+        'error' => "Route not found: /api/$route",
+        'available_routes' => [
+            'POST /api/auth/login',
+            'POST /api/auth/logout',
+            'POST /api/auth/create',
+            'GET  /api/player/stats',
+            'GET  /api/player/inventory',
+            'GET  /api/player/profile',
+            'GET  /api/player/messages',
+            'POST /api/game/action',
+            'POST /api/game/move',
+            'POST /api/game/fight',
+            'POST /api/game/heal',
+            'POST /api/game/bank',
+            'GET  /api/chat/messages',
+            'POST /api/chat/send',
+            'POST /api/chat/channel',
+            'GET  /api/clan/info',
+            'POST /api/clan/create',
+            'POST /api/clan/leave',
+            'POST /api/clan/donate',
+        ]
+    ]);
 }
-
-$segments = array_values(array_filter(explode('/', trim($path, '/')), function ($s) {
-    return $s !== '';
-}));
-
-$resource = $segments[0] ?? '';
-$rest = array_slice($segments, 1);
-
-$routeFile = __DIR__ . '/routes/' . basename($resource) . '.php';
-
-if ($resource === '' || !is_file($routeFile)) {
-    json_error('Unknown API endpoint', 404);
-}
-
-require $routeFile;

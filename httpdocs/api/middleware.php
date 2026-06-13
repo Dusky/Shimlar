@@ -1,53 +1,66 @@
 <?php
-// Shared bootstrap for all API requests: sessions, CORS, JSON helpers.
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+/**
+ * Shimlar API — Middleware (CORS, JSON headers, error handling)
+ */
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
-// Send a JSON response in the shape described by API_SPEC.md and stop.
-function json_response($data = [], $updates = [], $errors = [], $httpCode = 200) {
-    http_response_code($httpCode);
-    echo json_encode([
-        'success' => empty($errors),
-        'data' => $data,
-        'errors' => $errors,
-        'updates' => $updates,
-    ], JSON_UNESCAPED_SLASHES);
+/**
+ * Send JSON response
+ */
+function api_json($data, $code = 200) {
+    http_response_code($code);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
-// Convenience helper for simple error responses.
-function json_error($message, $httpCode = 400, $errors = null) {
-    json_response([], [], $errors ?? [$message], $httpCode);
+/**
+ * Send success response
+ */
+function api_success($data = [], $message = '') {
+    $response = ['success' => true];
+    if ($message) $response['message'] = $message;
+    if ($data) $response['data'] = $data;
+    api_json($response);
 }
 
-// Decode a JSON request body, falling back to $_POST for form submissions.
-function request_body() {
-    $raw = file_get_contents('php://input');
-    if ($raw !== false && strlen($raw) > 0) {
-        $decoded = json_decode($raw, true);
-        if (is_array($decoded)) {
-            return $decoded;
+/**
+ * Send error response
+ */
+function api_error($message, $code = 400, $details = []) {
+    $response = ['success' => false, 'error' => $message];
+    if ($details) $response['details'] = $details;
+    api_json($response, $code);
+}
+
+/**
+ * Get JSON input from request body
+ */
+function api_input() {
+    static $input = null;
+    if ($input === null) {
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw, true) ?: [];
+        // Also support form data
+        if (empty($input) && !empty($_POST)) {
+            $input = $_POST;
         }
     }
-    return $_POST;
+    return $input;
 }
 
-// Require an authenticated session. Returns [pid, pname] or sends a 401.
-function require_auth() {
-    if (empty($_SESSION['player_id']) || empty($_SESSION['player_name'])) {
-        json_error('Not logged in', 401);
-    }
-    return [$_SESSION['player_id'], $_SESSION['player_name']];
+/**
+ * Get a specific input field with optional default
+ */
+function api_get($key, $default = null) {
+    $input = api_input();
+    return isset($input[$key]) ? $input[$key] : $default;
 }
