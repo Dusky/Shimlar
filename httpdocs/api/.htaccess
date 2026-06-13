@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Let real files (e.g. this .htaccess) pass through untouched.
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Everything else under /api/ goes through the router, with the rest of the
+# path preserved as PATH_INFO (e.g. /api/auth/login -> index.php/auth/login).
+RewriteRule ^(.*)$ index.php/$1 [L]
