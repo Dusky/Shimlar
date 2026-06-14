@@ -15,6 +15,7 @@ services:
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
       - LOG_DIR=${LOG_DIR}
+      - GAME_URL=${GAME_URL}
     depends_on:
       db:
         condition: service_healthy

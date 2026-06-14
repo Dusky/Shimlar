@@ -94,19 +94,19 @@ function api_quest_list($pid) {
     $s = mysqli_fetch_assoc($sQ);
     $lvl = (int)$s['Lvl'];
     
-    $qQ = mysqli_query($dbx, "SELECT * FROM Quests WHERE Qminlvl <= $lvl AND Qmaxlvl >= $lvl ORDER BY Qnum DESC LIMIT 10");
+    $qQ = mysqli_query($dbx, "SELECT * FROM Quests WHERE Qlevel <= $lvl+200 ORDER BY Qnum DESC LIMIT 10");
     
     $quests = [];
     while ($q = mysqli_fetch_assoc($qQ)) {
         $quests[] = [
             'id'      => (int)$q['Qnum'],
-            'zone'    => (int)$q['ZoneId'],
+            'zone'    => (int)$q['Qzone'],
             'monster' => (int)$q['Qmon'],
             'expReward'   => (int)$q['Qexp'],
             'goldReward'  => (int)$q['Qgold'],
             'itemReward'  => (int)$q['Qitem'],
-            'minLevel' => (int)$q['Qminlvl'],
-            'maxLevel' => (int)$q['Qmaxlvl'],
+            'minLevel' => (int)$q['Qlevel'],
+            'maxLevel' => (int)$q['Qlevel'] + 200,
         ];
     }
     
@@ -135,8 +135,8 @@ function api_quest_accept($pid, $qnum) {
     $s = mysqli_fetch_assoc($sQ);
     $lvl = (int)$s['Lvl'];
     
-    if ($lvl < (int)$q['Qminlvl']) api_error('Level too low for this quest', 400);
-    if ($lvl > (int)$q['Qmaxlvl']) api_error('Level too high for this quest', 400);
+    if ($lvl < (int)$q['Qlevel']) api_error('Level too low for this quest', 400);
+    if ($lvl > (int)$q['Qlevel'] + 200) api_error('Level too high for this quest', 400);
     
     // Accept quest
     mysqli_query($dbx, "UPDATE Players SET Qnum=$qnum WHERE Id=$pid");
@@ -145,7 +145,7 @@ function api_quest_accept($pid, $qnum) {
         'action' => 'accept',
         'quest' => [
             'id'      => (int)$q['Qnum'],
-            'zone'    => (int)$q['ZoneId'],
+            'zone'    => (int)$q['Qzone'],
             'monster' => (int)$q['Qmon'],
             'expReward'   => (int)$q['Qexp'],
             'goldReward'  => (int)$q['Qgold'],
@@ -228,7 +228,7 @@ function api_quest_current($pid) {
         'activeQuest' => true,
         'quest' => [
             'id'      => (int)$q['Qnum'],
-            'zone'    => (int)$q['ZoneId'],
+            'zone'    => (int)$q['Qzone'],
             'monster' => (int)$q['Qmon'],
             'expReward'   => (int)$q['Qexp'],
             'goldReward'  => (int)$q['Qgold'],
