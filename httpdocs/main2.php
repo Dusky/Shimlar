@@ -4,7 +4,8 @@ require '../incz/mainx2.inc';
 
 global $HTTP_REFERER;
 
-$position = strpos($_SERVER['HTTP_REFERER'] , "http://www.shimlar.org/");
+$_game_url = getenv('GAME_URL') ?: 'http://localhost:9090/';
+$position = strpos($_SERVER['HTTP_REFERER'] ?? '', $_game_url);
 $doItAnyways = false;
 
 if (($doItAnyways==true) || ( $position !== false )) {

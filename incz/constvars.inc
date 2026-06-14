@@ -205,7 +205,8 @@ function getPKTag($byid){
 
 function getIdByLogin($bylogin){
   global $dbx;
-  if (trim($bylogin) == ""){
+  $bylogin = mysqli_real_escape_string($dbx, trim($bylogin));
+  if ($bylogin == ""){
   	$playerid = -1;
   } else {
   	$query="select Id from Players where login = '$bylogin'";

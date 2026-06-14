@@ -3,16 +3,24 @@
 include '../incz/constvars.inc'; 
 init_dbx();
 
-$toplist = $_POST["toplist"];
-$rt = $_POST["rt"];
+$toplist = $_POST["toplist"] ?? '';
+$rt = $_POST["rt"] ?? '';
 
 if($toplist=="") {
-	$toplist=$_GET["toplist"];
+	$toplist=$_GET["toplist"] ?? '';
 }
 if($toplist=="") {	
   $toplist="fame";
 }
 
+// Whitelist valid toplist values
+$valid_lists = ['fame','exp','gold','good','evil','quest','muted','mods','qdelay','jail','clan','clant','married','pk'];
+if(!in_array($toplist, $valid_lists)) {
+  $toplist = 'fame';
+}
+
+// Sanitize race filter
+$rt = (int)$rt;
 if($rt<-1 || $rt>19){
   $rt=-1;
 }

@@ -10,14 +10,14 @@ init_dbx();
   	print "</script>";
   }
   print "<script language=\"javascript\">";
-$newpl=ucwords(trim($_POST["newpl"]));
-$newlogin=ucwords(trim($_POST["newlogin"]));
-$maili=str_replace("www.", "", $_POST["maili"]);
-$newpw=$_POST["newpw"];
-$newpw2 = $_POST["newpw2"];
-$rn2=$_POST["rn2"];
-$gn2=$_POST["gn2"];
-$statusType=$_POST["statusType"];
+$newpl=ucwords(trim($_POST["newpl"] ?? ''));
+$newlogin=ucwords(trim($_POST["newlogin"] ?? ''));
+$maili=str_replace("www.", "", $_POST["maili"] ?? '');
+$newpw=$_POST["newpw"] ?? '';
+$newpw2 = $_POST["newpw2"] ?? '';
+$rn2=(int)($_POST["rn2"] ?? 0);
+$gn2=(int)($_POST["gn2"] ?? 0);
+$statusType=(int)($_POST["statusType"] ?? 0);
 
 if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
   if(cr_tarkista($newpl,1) && cr_tarkista($newpw,0) && cr_tarkista($newpw2,0) && cr_tarkista($maili,0) && cr_tarkista($newlogin,0)) {
@@ -31,7 +31,7 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
     	$stopSales=$statusType;
     	
     	// only allow 3 not activated chars / ip
-    	$query = "select * from Players where last_ip = '".$_SERVER['REMOTE_ADDR']."' and pstatus = 0";
+    	$query = "select * from Players where last_ip = '.$remote_ip_esc.' and pstatus = 0";
     	$result = mysqli_query($dbx, $query);
     	if ($result==true and mysqli_num_rows($result)>4) {
     		$doContinue = false;
@@ -150,18 +150,24 @@ if ((strlen($newpl)>3) && (strlen($maili)>6) && (strlen($newlogin)>3) && false){
             $zone=$rn2;
             
             $newpl = better_ucwords($newpl);
+            $newpl_esc = mysqli_real_escape_string($dbx, $newpl);
+            $newlogin_esc = mysqli_real_escape_string($dbx, $newlogin);
+            $maili_esc = mysqli_real_escape_string($dbx, $maili);
+            $newpw_hash = password_hash($newpw, PASSWORD_DEFAULT);
+            $newpw_hash_esc = mysqli_real_escape_string($dbx, $newpw_hash);
+            $remote_ip_esc = mysqli_real_escape_string($dbx, $_SERVER["REMOTE_ADDR"] ?? "");
           
             $query2="Insert into Players Values 
-(null,'$newpl','$newpw','$maili','',1,1,$zone,$newChannel,0,0,0,0,0,0,0,$fire_bonus,$cold_bonus,$air_bonus,$arcane_bonus,$sword_bonus,$axe_bonus,$staff_bonus,$mace_bonus,$armor_bonus,1,now(),'cr',now(),1,1,1,1,'".$_SERVER['REMOTE_ADDR']."',0,0,0,'$newlogin')";
+(null,'$newpl_esc','$newpw_hash_esc','$maili_esc','',1,1,$zone,$newChannel,0,0,0,0,0,0,0,$fire_bonus,$cold_bonus,$air_bonus,$arcane_bonus,$sword_bonus,$axe_bonus,$staff_bonus,$mace_bonus,$armor_bonus,1,now(),'cr',now(),1,1,1,1,'$remote_ip_esc',0,0,0,'$newlogin_esc')";
             mysqli_query($dbx, $query2);
             $userid = mysqli_insert_id($dbx);
           
             $query4="Insert into Stats Values 
-($userid,'$newpl',0,$rt,$r_str,$r_dex,$r_vit,$r_ntl,$r_wis,$r_vit,0,$newGold,0,1,$newLevel,0,0,1,0,0,now(),'',0,now(),now(),0,$stopSales,0,1080,$statusType,0)";
+($userid,'$newpl_esc',0,$rt,$r_str,$r_dex,$r_vit,$r_ntl,$r_wis,$r_vit,0,$newGold,0,1,$newLevel,0,0,1,0,0,now(),'',0,now(),now(),0,$stopSales,0,1080,$statusType,0)";
             mysqli_query($dbx, $query4);
 
             $query3="Insert into Inventory Values 
-($userid,'$newpl',1000000,5000000,$newOrb,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,$newOrbEquip,0,0)";
+($userid,'$newpl_esc',1000000,5000000,$newOrb,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,$newOrbEquip,0,0)";
             mysqli_query($dbx, $query3);
           
             // send email in the background

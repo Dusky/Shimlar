@@ -11,20 +11,19 @@ $usepl = false;
 $usecn = false;
 $isSent	= false;
 
-if (strlen($_POST["pl"])>3) 
+if (strlen($_POST["pl"] ?? '')>3) 
 	$usepl = true;
-else if (strlen($_POST["cn"]) > 3) {
+else if (strlen($_POST["cn"] ?? '') > 3) {
   $usecn = true;
 }
 if ($usepl) {
-	if(tarkista($_POST["pl"])) {
-  		$l=ucwords($_POST["pl"]);
-  		$query="Select name as nimi, email, password, login from Players where login='$l'";
+	if(tarkista($_POST["pl"] ?? "")) {
+  		$l = mysqli_real_escape_string($dbx, ucwords($_POST["pl"]));
+  		$query="Select name as nimi, email, login from Players where login='$l'";
   		if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1) {
     			extract(mysqli_fetch_array($result));
 					$subject = "Shimlar recovery: $nimi";
-					$message = "Your password for character named $nimi is : $password.\r\n" .
-						"Your login is: $login.\r\n" .
+					$message = "Your login for character named $nimi is: $login. Please use the password reset feature to set a new password.\r\n" .
 						"Do NOT reply to this message.\r\n" .
 						"\r\n" .
 						"Lord A";
@@ -52,14 +51,13 @@ if ($usepl) {
   		print "</script>";
 	}
 } else if($usecn) {
-	if(tarkista($_POST["cn"])) {
-  		$l=ucwords($_POST["cn"]);
-  		$query="Select name as nimi, email, password, login from Players where name='$l'";
+	if(tarkista($_POST["cn"] ?? "")) {
+  		$l = mysqli_real_escape_string($dbx, ucwords($_POST["cn"]));
+  		$query="Select name as nimi, email, login from Players where name='$l'";
   		if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1) {
     			extract(mysqli_fetch_array($result));
 					$subject = "Shimlar recovery: $nimi";
-					$message = "Your password for character named $nimi is : $password.\r\n" .
-						"Your login is: $login.\r\n" .
+					$message = "Your login for character named $nimi is: $login. Please use the password reset feature to set a new password.\r\n" .
 						"Do NOT reply to this message.\r\n" .
 						"\r\n" .
 						"Lord A";

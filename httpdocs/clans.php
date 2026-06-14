@@ -2,12 +2,11 @@
 
 include '../incz/constvars.inc'; 
 init_dbx();
-if($cx=="") {
-  $cx="all";
-}
-if($cx!="all") {
-  if($cx!="a"){
-    $query="Select cid from Clans where cname='$cx'";
+$cx = $_GET['cx'] ?? $_POST['cx'] ?? 'all';
+$cx_esc = mysqli_real_escape_string($dbx, $cx);
+if($cx_esc != "all") {
+  if($cx_esc!="a"){
+    $query="Select cid from Clans where cname='$cx_esc'";
     $result=mysqli_query($dbx, $query);
     extract(mysqli_fetch_array($result));
     $query="Select name,lvl from Stats where clan=$cid order by lvl desc,exp desc limit 150";

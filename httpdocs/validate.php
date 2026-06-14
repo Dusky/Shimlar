@@ -2,10 +2,10 @@
 include '../incz/constvars.inc';
 init_dbx();
 
-$userid=$_GET["u"];
-$nr=$_GET["nr"];
+$userid=(int)($_GET["u"] ?? 0);
+$nr=(int)($_GET["nr"] ?? 0);
 
-if ((strlen($userid)>0) && (strlen($nr)>9)){
+if (($userid > 0) && ($nr > 0)){
 	$query = "select name,UNIX_TIMESTAMP(ax_time) as ax_time,banned,login from Players where lastaction='cr' and Id = $userid and pstatus = 0";
 	if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
      		extract(mysqli_fetch_array($result),EXTR_PREFIX_ALL,"this");

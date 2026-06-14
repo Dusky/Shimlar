@@ -2,8 +2,9 @@
 include '../incz/constvars.inc';
 include '../incz/batx4.inc'; 
 global $HTTP_REFERER;
-$position = strpos($_SERVER['HTTP_REFERER'] , "http://www.shimlar.org/");
-if ( $position !== false ) {
+$_game_url = getenv('GAME_URL') ?: 'http://localhost:9090/';
+$position = strpos($_SERVER['HTTP_REFERER'] ?? '', $_game_url);
+if ( $position !== false || ($_SERVER['HTTP_REFERER'] ?? '') === '' ) {
   init_dbx();
   sleep(1);
   $randomz = rand(1,50);

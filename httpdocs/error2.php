@@ -11,7 +11,8 @@ if(isset($_GET["l"]) && isset($_GET["p"])) {
 		
 	if (strlen($pass)>0){
 		$pid = (int)$user;
-		$query="Select name as nimi from Players where Id=$pid and password='$pass'";
+		$pass_esc = mysqli_real_escape_string($dbx, $pass);
+		$query="Select name as nimi from Players where Id=$pid and password='$pass_esc'";
     if(($result=mysqli_query($dbx, $query))==TRUE && mysqli_num_rows($result)==1){
 			$row=mysqli_fetch_row($result);
 			$query="insert into Modactions values('Lord A 2', '$row[0]', 'SCRIPT', now())";
