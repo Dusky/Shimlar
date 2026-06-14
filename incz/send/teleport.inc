@@ -3,12 +3,12 @@
 global $dbx;
             if($channels==20 || $channels==12){
               $loc_x=strstr($cinput," ");
-              $loc_y=split(":",$loc_x);
-              $zname=ereg_replace( "'", "\'", ucwords(trim($loc_y[0])));
+              $loc_y=explode(":",$loc_x);
+              $zname=str_replace( "'", "\'", ucwords(trim($loc_y[0])));
               if(($loc_y[1]==null)||strlen($loc_y[1]<3)) {
                 $loc_y[1]="1,1";
               }
-              $loc_z=split(",",$loc_y[1]);
+              $loc_z=explode(",",$loc_y[1]);
               $loc_x=trim($loc_z[0]);
               $loc_y=trim($loc_z[1]);
               $query="Select Nnum as loc_zone from Names where Nname='$zname'";
