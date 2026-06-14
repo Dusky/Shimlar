@@ -49,11 +49,16 @@ master             — original upstream (KoenVingerhoets)
 ## 🔧 REMAINING WORK
 
 ### Critical (PHP 8 / Security)
-- [ ] **Fix `ereg_replace`** in `incz/send/teleport.inc` → `preg_replace`
-- [ ] **SQL injection** — legacy PHP files pass `$_GET`/`$_POST` directly into queries (validate.php, claninfo.php, error.php, error2.php, ranks2.php, create.php, scx.php, send.php)
-- [ ] **XSS audit** — legacy files output user input without escaping
-- [ ] **`$HTTP_REFERER` check** in battle4.php hardcodes `shimlar.org` — needs env-based config
-- [ ] **Password storage audit** — create.php stores password, need to verify it's hashed
+- [x] **Fix `ereg_replace`** in `incz/send/teleport.inc` → `preg_replace`/`str_replace` + `split()` → `explode()`
+- [x] **SQL injection** — all legacy PHP files sanitized with `mysqli_real_escape_string` / `(int)` casts / whitelist validation
+- [x] **Password hashing** — `create.php` now uses `password_hash(PASSWORD_DEFAULT)` (bcrypt)
+- [x] **Plaintext password email** — `recover.php` no longer sends passwords in emails
+- [x] **`$HTTP_REFERER` check** — battle4.php, cx.php, main2.php now use env-based `GAME_URL`
+- [x] **`getIdByLogin()`** — input now escaped
+- [x] **Register globals fix** — `clans.php` `$cx` now properly sourced from `$_GET`/`$_POST`
+- [ ] **XSS audit** — legacy files still output user input in JS context without escaping in some places
+- [ ] **Password migration** — existing players still have plaintext/md5 passwords, need migration script
+- [ ] **Input validation layer** — chat command files (`incz/send/*.inc`) use `cfix()` + `tarkista()` which is basic; could be stronger
 
 ### API Gaps (features not yet exposed)
 - [ ] **Market/trading** — item transfers, marketplace
